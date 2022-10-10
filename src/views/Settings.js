@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 function Settings() {
 
+  const [difficulty, setDifficutlty] = useState("easy");
 
 
+  return (
+    <form>
 
-  return <div>hi</div>;
+    </form>
+  )
 };
 export default Game;
