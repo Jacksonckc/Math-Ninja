@@ -52,7 +52,7 @@ export default function SignIn() {
       await signInWithEmailAndPassword(auth, signInEmail, signInPassword);
       console.log('Sign In successful!');
     } catch (err) {
-      console.log(err.message);
+      alert('Incorrect username or password');
     }
   };
 
@@ -67,11 +67,12 @@ export default function SignIn() {
       'user',
       JSON.stringify({ id: user?.uid, email: user?.email })
     );
-    user && navigate('/Profile');
+    user && navigate('/');
   }, [user]);
 
-  const handleSignOut = () => {
-    signOut(auth);
+  const handleSignOut = async (event) => {
+    event.preventDefault();
+    await signOut(auth);
   };
 
   return (
@@ -151,7 +152,7 @@ export default function SignIn() {
                 fullWidth
                 variant='contained'
                 sx={{ mt: 3, mb: 2 }}
-                onClick={handleSignOut}
+                onClick={(event) => handleSignOut(event)}
               >
                 Sign Out
               </Button>

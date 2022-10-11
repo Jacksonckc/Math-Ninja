@@ -80,7 +80,7 @@ export default function SignUp() {
         console.log(err);
       }
 
-      user && navigate('/Profile');
+      user && navigate('/');
     };
     setData();
   }, [user]);

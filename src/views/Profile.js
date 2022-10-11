@@ -11,6 +11,7 @@ const Profile = () => {
   useEffect(() => {
     const getUserDataFromFB = async () => {
       const id = JSON.parse(localStorage.getItem('user')).id;
+      !id && navigate('/Signin');
       await getDoc(doc(userCollectionRef, id));
       // This won't work when you have an account and sign in because lname and fname will be lost from register.
       setUser((await getDoc(doc(userCollectionRef, id))).data());
@@ -19,7 +20,8 @@ const Profile = () => {
   }, []);
 
   console.log(user);
-  const handleSignOut = async () => {
+  const handleSignOut = async (event) => {
+    event.preventDefault();
     try {
       await signOut(auth);
       navigate('/SignIn');
@@ -35,7 +37,7 @@ const Profile = () => {
       <div>Your email: {user?.email}</div>
       <br />
       <hr />
-      <button onClick={handleSignOut}>Log Out</button>
+      <button onClick={(event) => handleSignOut(event)}>Log Out</button>
     </div>
   );
 };
