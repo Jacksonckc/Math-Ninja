@@ -32,11 +32,14 @@ const Profile = () => {
   return (
     <div>
       <h1>
-        Welcome: {user?.fname} {user?.lname}
+        Welcome {user?.fname} {user?.lname} to Math Ninja!
       </h1>
+      <p>Are you ready for the adventure?</p>
       <div>Your email: {user?.email}</div>
       <br />
       <hr />
+
+      <br />
       <button onClick={(event) => handleSignOut(event)}>Log Out</button>
     </div>
   );
