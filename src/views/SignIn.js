@@ -12,10 +12,13 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
-// import { auth, firestore } from '/firebase';
-
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+} from 'firebase/auth';
 import { auth } from '../firebase';
+import { useNavigate } from 'react-router-dom';
 
 function Copyright(props) {
   return (
@@ -37,27 +40,39 @@ function Copyright(props) {
 
 const theme = createTheme();
 
-export default function SignInSide() {
+export default function SignIn() {
   const [signInEmail, setSignInEmail] = useState('');
   const [signInPassword, setSignInPassword] = useState('');
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
+  const handleSignIn = async (event) => {
     event.preventDefault();
     try {
-      signInWithEmailAndPassword(auth, signInEmail, signInPassword);
+      await signInWithEmailAndPassword(auth, signInEmail, signInPassword);
       console.log('Sign In successful!');
     } catch (err) {
       console.log(err.message);
     }
   };
 
-  //   useEffect(() => {
-  //     onAuthStateChanged(auth, (currentUser) => {
-  //       setUser(currentUser);
-  //       // Only set user info for redux when the uid is returned from user
-  //     });
-  //   }, [auth]);
+  useEffect(() => {
+    onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+  }, [auth]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      'user',
+      JSON.stringify({ id: user?.uid, email: user?.email })
+    );
+    user && navigate('/Profile');
+  }, [user]);
+
+  const handleSignOut = () => {
+    signOut(auth);
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -127,9 +142,18 @@ export default function SignInSide() {
                 fullWidth
                 variant='contained'
                 sx={{ mt: 3, mb: 2 }}
-                onClick={(event) => handleSubmit(event)}
+                onClick={(event) => handleSignIn(event)}
               >
                 Sign In
+              </Button>
+              <Button
+                type='submit'
+                fullWidth
+                variant='contained'
+                sx={{ mt: 3, mb: 2 }}
+                onClick={handleSignOut}
+              >
+                Sign Out
               </Button>
               <Grid container>
                 <Grid item xs>
@@ -138,7 +162,11 @@ export default function SignInSide() {
                   </Link>
                 </Grid>
                 <Grid item>
-                  <Link href='#' variant='body2'>
+                  <Link
+                    href='#'
+                    variant='body2'
+                    onClick={() => navigate('/SignUp')}
+                  >
                     {"Don't have an account? Sign Up"}
                   </Link>
                 </Grid>

@@ -1,20 +1,19 @@
 import './App.css';
-import Header from './components/Header';
-import LoginPage from './views/LoginPage';
-import Game from './views/Game';
 
-import { SignIn } from './views';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { SignIn, Game, Profile, SignUp } from './views';
 
 function App() {
   return (
     <div className='App'>
-      {/* <BrowserRouter>
-        <Route exact path='/'>
-          <SignIn />
-        </Route>
-      </BrowserRouter> */}
-
-      <Game />
+      <BrowserRouter>
+        <Routes>
+          <Route exact path='/SignIn' element={<SignIn />} />
+          <Route exact path='/SignUp' element={<SignUp />} />
+          <Route exact path='/Game' element={<Game />} />
+          <Route exact path='/Profile' element={<Profile />} />
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 }
