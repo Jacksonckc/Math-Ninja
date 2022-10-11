@@ -70,11 +70,6 @@ export default function SignIn() {
     user && navigate('/');
   }, [user]);
 
-  const handleSignOut = async (event) => {
-    event.preventDefault();
-    await signOut(auth);
-  };
-
   return (
     <ThemeProvider theme={theme}>
       <Grid container component='main' sx={{ height: '100vh' }}>
@@ -146,15 +141,6 @@ export default function SignIn() {
                 onClick={(event) => handleSignIn(event)}
               >
                 Sign In
-              </Button>
-              <Button
-                type='submit'
-                fullWidth
-                variant='contained'
-                sx={{ mt: 3, mb: 2 }}
-                onClick={(event) => handleSignOut(event)}
-              >
-                Sign Out
               </Button>
               <Grid container>
                 <Grid item xs>
