@@ -19,7 +19,10 @@ const Profile = () => {
     getUserDataFromFB();
   }, []);
 
-  console.log(user);
+  useEffect(() => {
+    user && localStorage.setItem('user', JSON.stringify(user));
+  }, [user]);
+
   const handleSignOut = async (event) => {
     event.preventDefault();
     try {
@@ -41,6 +44,9 @@ const Profile = () => {
 
       <br />
       <button onClick={(event) => handleSignOut(event)}>Log Out</button>
+      <button onClick={() => navigate('/Dashboard')}>Go to my Dashboard</button>
+      <button onClick={() => navigate('/GameMode')}>Go to GameMode</button>
+      <button onClick={() => navigate('/Game')}>Go to Game</button>
     </div>
   );
 };
