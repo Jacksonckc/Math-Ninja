@@ -9,6 +9,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import LayersIcon from '@mui/icons-material/Layers';
 import AssignmentIcon from '@mui/icons-material/Assignment';
+import { Score } from '@mui/icons-material';
 
 export const mainListItems = (
   <React.Fragment>
@@ -20,15 +21,15 @@ export const mainListItems = (
     </ListItemButton>
     <ListItemButton>
       <ListItemIcon>
-        <ShoppingCartIcon />
+        <Score />
       </ListItemIcon>
-      <ListItemText primary='Orders' />
+      <ListItemText primary='Scores' />
     </ListItemButton>
     <ListItemButton>
       <ListItemIcon>
         <PeopleIcon />
       </ListItemIcon>
-      <ListItemText primary='Customers' />
+      <ListItemText primary='Players' />
     </ListItemButton>
     <ListItemButton>
       <ListItemIcon>
@@ -48,7 +49,7 @@ export const mainListItems = (
 export const secondaryListItems = (
   <React.Fragment>
     <ListSubheader component='div' inset>
-      Saved reports
+      Saved Records
     </ListSubheader>
     <ListItemButton>
       <ListItemIcon>
@@ -66,7 +67,7 @@ export const secondaryListItems = (
       <ListItemIcon>
         <AssignmentIcon />
       </ListItemIcon>
-      <ListItemText primary='Year-end sale' />
+      <ListItemText primary='Year-end records' />
     </ListItemButton>
   </React.Fragment>
 );
