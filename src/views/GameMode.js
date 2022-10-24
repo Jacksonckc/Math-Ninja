@@ -21,8 +21,8 @@ const GameMode = () => {
 
     <div>
       <div display='flex' justifyContent='center'>
-        <form>
-          <ButtonGroup variant="contained" orientation='vertical'>
+        <form  id='GamemodeForm'>
+          <ButtonGroup variant="contained" orientation='vertical' id="GamemodeButtonGroup">
             <Button onClick={() => (localStorage.setItem("difficulty", "easy"))}>Easy</Button>
             <Button onClick={() => (localStorage.setItem("difficulty", "medium"))}>Medium</Button>
             <Button onClick={() => (localStorage.setItem("difficulty", "hard"))}>Hard</Button>
