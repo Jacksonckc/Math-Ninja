@@ -17,10 +17,28 @@ import Link from '@mui/material/Link';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import { mainListItems, secondaryListItems } from '../components';
-// import Chart from './Chart';
-// import Deposits from './Deposits';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import ListSubheader from '@mui/material/ListSubheader';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import PeopleIcon from '@mui/icons-material/People';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import LayersIcon from '@mui/icons-material/Layers';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import {
+  ScoreboardTwoTone,
+  House,
+  VideogameAsset,
+  DisplaySettings,
+  Logout,
+} from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
+import { signOut } from 'firebase/auth';
+
+import { auth } from '../firebase';
 import { Scores } from '../components';
+import { Profile, Game, GameMode } from '../views/index';
 
 function Copyright(props) {
   return (
@@ -32,7 +50,7 @@ function Copyright(props) {
     >
       {'Copyright © '}
       <Link color='inherit' href='https://mui.com/'>
-        Your Website
+        Math Ninja
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -89,9 +107,22 @@ const Drawer = styled(MuiDrawer, {
 const mdTheme = createTheme();
 
 function DashboardContent() {
+  const [page, setPage] = React.useState(<Profile />);
   const [open, setOpen] = React.useState(true);
+  const navigate = useNavigate();
+
   const toggleDrawer = () => {
     setOpen(!open);
+  };
+
+  const handleSignOut = async (event) => {
+    event.preventDefault();
+    try {
+      await signOut(auth);
+      navigate('/SignIn');
+    } catch (err) {
+      alert(err);
+    }
   };
 
   return (
@@ -126,7 +157,7 @@ function DashboardContent() {
               Dashboard
             </Typography>
             <IconButton color='inherit'>
-              <Badge badgeContent={4} color='secondary'>
+              <Badge badgeContent={1} color='secondary'>
                 <NotificationsIcon />
               </Badge>
             </IconButton>
@@ -147,9 +178,56 @@ function DashboardContent() {
           </Toolbar>
           <Divider />
           <List component='nav'>
-            {mainListItems}
+            <React.Fragment>
+              <ListItemButton onClick={() => setPage(<Profile />)}>
+                <ListItemIcon>
+                  <House />
+                </ListItemIcon>
+                <ListItemText primary='Profile' />
+              </ListItemButton>
+              <ListItemButton onClick={() => setPage(<Scores />)}>
+                <ListItemIcon>
+                  <ScoreboardTwoTone />
+                </ListItemIcon>
+                <ListItemText primary='Scores' />
+              </ListItemButton>
+              <ListItemButton onClick={() => navigate('/GameMode')}>
+                <ListItemIcon>
+                  <DisplaySettings />
+                </ListItemIcon>
+                <ListItemText primary='Game Mode' />
+              </ListItemButton>
+              <ListItemButton onClick={() => navigate('/Game')}>
+                <ListItemIcon>
+                  <VideogameAsset />
+                </ListItemIcon>
+                <ListItemText primary='Math Ninja!' />
+              </ListItemButton>
+              <ListItemButton onClick={(event) => handleSignOut(event)}>
+                <ListItemIcon>
+                  <Logout />
+                </ListItemIcon>
+                <ListItemText primary='Log Out' />
+              </ListItemButton>
+            </React.Fragment>
             <Divider sx={{ my: 1 }} />
-            {secondaryListItems}
+            <React.Fragment>
+              <ListSubheader component='div' inset>
+                Saved Records
+              </ListSubheader>
+              <ListItemButton>
+                <ListItemIcon>
+                  <AssignmentIcon />
+                </ListItemIcon>
+                <ListItemText primary='Current month' />
+              </ListItemButton>
+              <ListItemButton>
+                <ListItemIcon>
+                  <AssignmentIcon />
+                </ListItemIcon>
+                <ListItemText primary='Year-end records' />
+              </ListItemButton>
+            </React.Fragment>
           </List>
         </Drawer>
         <Box
@@ -165,40 +243,11 @@ function DashboardContent() {
           }}
         >
           <Toolbar />
-          <Container maxWidth='lg' sx={{ mt: 4, mb: 4 }}>
-            <Grid container spacing={3}>
-              {/* Chart */}
-              <Grid item xs={12} md={8} lg={9}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: 240,
-                  }}
-                >
-                  {/* <Chart /> */}
-                </Paper>
-              </Grid>
-              {/* Recent Deposits */}
-              <Grid item xs={12} md={4} lg={3}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: 240,
-                  }}
-                >
-                  {/* <Deposits /> */}
-                </Paper>
-              </Grid>
-              {/* Recent Orders */}
-              <Grid item xs={12}>
-                <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  <Scores />
-                </Paper>
-              </Grid>
+          <Container maxWidth='lg' sx={{ mt: 10, mb: 4 }}>
+            <Grid item xs={12}>
+              <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+                {page}
+              </Paper>
             </Grid>
             <Copyright sx={{ pt: 4 }} />
           </Container>
