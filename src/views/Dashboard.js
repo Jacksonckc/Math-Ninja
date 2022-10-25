@@ -118,8 +118,10 @@ function DashboardContent() {
   const handleSignOut = async (event) => {
     event.preventDefault();
     try {
-      await signOut(auth);
-      navigate('/SignIn');
+      if (window.confirm('Are you sure you want to sign out?')) {
+        await signOut(auth);
+        navigate('/SignIn');
+      }
     } catch (err) {
       alert(err);
     }
