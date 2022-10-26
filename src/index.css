@@ -1,9 +1,24 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 #GamemodeForm {
   width: 100vw;
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+  background: url("/public/ninjaBackground.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+#GamemodeForm #GamemodeButtonGroup > * {
+  opacity: 0.8;
+  margin: 20px 40px;
+  padding: 5px 20px;
 }
 
 iframe {
