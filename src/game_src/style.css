@@ -1,0 +1,6 @@
+#canvas {
+  border: 3px solid black;
+  width: 1000px;
+  height: 1000px;
+  background: radial-gradient(#e66465, #9198e5);
+}

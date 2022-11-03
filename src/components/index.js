@@ -1,6 +1,6 @@
-import Header from './Header';
-import Scores from './Scores';
+import Header from "./Header";
+import Scores from "./Scores";
 
-import Title from './Title';
+import Title from "./Title";
 
 export { Header, Scores, Title };
