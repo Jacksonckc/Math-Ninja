@@ -8,6 +8,8 @@ class Target {
     this.y = y;
     this.vx = vx;
     this.vy = vy;
+
+    this.active = false;
   }
 
   draw(ctx) {
@@ -16,6 +18,8 @@ class Target {
   }
 
   tick() {
+    if (!active) return;
+    
     const GRAVITY = 1; // TODO
     this.vy -= GRAVITY; // TODO
 
@@ -26,9 +30,14 @@ class Target {
 
   onClick() {
     console.log("Implement onClick in Target");
+    return this.correct;
   }
 
-  clicked() {
-    return this.correct;
+  draw() {
+    return
+  }
+
+  start() {
+    this.active = true;
   }
 }
