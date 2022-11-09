@@ -32,12 +32,13 @@ import {
   VideogameAsset,
   DisplaySettings,
   Logout,
+  FlashOnRounded,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 
 import { auth } from '../firebase';
-import { Scores } from '../components';
+import { Scores, Notification } from '../components';
 import { Profile, Game, GameMode } from '../views/index';
 
 function Copyright(props) {
@@ -109,6 +110,8 @@ const mdTheme = createTheme();
 function DashboardContent() {
   const [page, setPage] = React.useState(<Profile />);
   const [open, setOpen] = React.useState(true);
+  const [showNotification, setShowNotification] = React.useState(false);
+  console.log(showNotification);
   const navigate = useNavigate();
 
   const toggleDrawer = () => {
@@ -129,7 +132,7 @@ function DashboardContent() {
 
   return (
     <ThemeProvider theme={mdTheme}>
-      <Box sx={{ display: 'flex' }}>
+      <Box sx={{ display: 'flex', zIndex: 1 }}>
         <CssBaseline />
         <AppBar position='absolute' open={open}>
           <Toolbar
@@ -158,7 +161,13 @@ function DashboardContent() {
             >
               Dashboard
             </Typography>
-            <IconButton color='inherit'>
+            <IconButton
+              color='inherit'
+              onClick={() => {
+                setShowNotification(!showNotification);
+                open && setOpen(!open);
+              }}
+            >
               <Badge badgeContent={1} color='secondary'>
                 <NotificationsIcon />
               </Badge>
@@ -213,23 +222,6 @@ function DashboardContent() {
               </ListItemButton>
             </React.Fragment>
             <Divider sx={{ my: 1 }} />
-            <React.Fragment>
-              <ListSubheader component='div' inset>
-                Saved Records
-              </ListSubheader>
-              <ListItemButton>
-                <ListItemIcon>
-                  <AssignmentIcon />
-                </ListItemIcon>
-                <ListItemText primary='Current month' />
-              </ListItemButton>
-              <ListItemButton>
-                <ListItemIcon>
-                  <AssignmentIcon />
-                </ListItemIcon>
-                <ListItemText primary='Year-end records' />
-              </ListItemButton>
-            </React.Fragment>
           </List>
         </Drawer>
         <Box
@@ -255,6 +247,11 @@ function DashboardContent() {
           </Container>
         </Box>
       </Box>
+      {showNotification && (
+        <table id='dashboard-notification_table'>
+          <Notification />
+        </table>
+      )}
     </ThemeProvider>
   );
 }
