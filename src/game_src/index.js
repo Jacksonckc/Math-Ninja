@@ -14,18 +14,20 @@ const questions = [
 ];
 
 let x = 0;
-let y = 1000;
+let y = 100;
 let frame = 0;
 const frameIncrementSpeed = 4;
 let lastTime = 0;
 let timeQuestion = 120;
 let idx = 0;
+let score = 0;
+let playerLives = 3;
 
 const animate = (timestamp) => {
   let deltaTime = timestamp - lastTime;
   lastTime = timestamp;
   // console.log(deltaTime);
-  console.log(timeQuestion);
+  // console.log(timeQuestion);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   // ctx.drawImage(image, frame * 200, 0, 200, 179, x, 10, 100, 100);
   ctx.fillText("1", 50, y);
@@ -33,6 +35,8 @@ const animate = (timestamp) => {
   ctx.fillText("3", 150, y);
   ctx.fillText("4", 200, y);
   ctx.fillText(questions[idx].question, 500, 500);
+  ctx.fillText(`Score: ${score}`, 850, 50);
+  ctx.fillText(`Lives: ${playerLives}`, 50, 50);
   ctx.font = "30px Arial";
   update();
   requestAnimationFrame(animate);
@@ -40,7 +44,16 @@ const animate = (timestamp) => {
 
 const update = () => {
   if (y < 0) {
-    y = 1000;
+    y = 100;
+
+    // Player Lives Logic
+    playerLives -= 1;
+    if (playerLives === 0) {
+      // alert("End game");
+      playerLives = 3;
+      score = 0;
+      // Send data to database
+    }
   } else {
     y--;
   }
@@ -86,3 +99,18 @@ var ball = {
   },
 };
 ball.draw();
+
+// Event listener
+// TODO: add more logic to this once spawner is almost done
+canvas.addEventListener("click", (e) => {
+  console.log(e.pageX, e.pageY);
+  ctx.fillText(".", e.pageX, e.pageY);
+  // For index add logic if it is wrong from spawner
+  if (idx === questions.length - 1) {
+    idx = 0;
+  } else {
+    idx += 1;
+  }
+  timeQuestion = 120;
+  score += 1;
+});
