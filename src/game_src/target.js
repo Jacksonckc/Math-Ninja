@@ -1,24 +1,24 @@
-class Target {
+export class Target {
   constructor(value, isCorrectAnswer) {
     this.value = value;
     this.correct = isCorrectAnswer;
     this.color = "THIS SHOULD BE RANDOM"; // TODO
 
-    this.x = x;
-    this.y = y;
-    this.vx = vx;
-    this.vy = vy;
+    this.x = 100;
+    this.y = 100;
+    this.vx = 0;
+    this.vy = 0;
 
     this.active = false;
   }
 
   draw(ctx) {
     // Draw text to screen
-    ctx.fillText(this.value, is.x, this.y)
+    ctx.fillText(this.value.toString(), this.x, this.y)
   }
 
   tick() {
-    if (!active) return;
+    if (!(this.active)) return;
     
     const GRAVITY = 1; // TODO
     this.vy -= GRAVITY; // TODO
@@ -31,10 +31,6 @@ class Target {
   onClick() {
     console.log("Implement onClick in Target");
     return this.correct;
-  }
-
-  draw() {
-    return
   }
 
   start() {
