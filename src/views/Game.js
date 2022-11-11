@@ -1,9 +1,89 @@
 import React from 'react';
 
-const Game = () => {
+import { Target } from '../game_src/target';
+
+
+function Game() {
+  const [score, setScore] = React.useState(0);
+  const [playerLives, setPlayerLives] = React.useState(3);
+
+  const [idx, setIdx] = React.useState(0);
+  const lastTime = React.useRef(0);
+
+
+  const [questions, setQuestions] = React.useState([
+    { answer: 3, question: "1 + 2" },
+    { answer: 4, question: "2 + 2" },
+    { answer: 4, question: "3 + 1" },
+  ]);
+
+  const [timeQuestion, setTimeQuestion] = React.useState(120);
+
+  const [targets, setTargets] = React.useState([
+    new Target(9, true),
+    new Target(3, false),
+    new Target(1, false),
+  ])
+
+
+
+
+
+  const canvasRef = React.useRef()
+  const [ctx, setCtx] = React.useState();
+
+  const animate = React.useCallback((timestamp) => {
+    lastTime.current = timestamp;
+
+    const canvas = canvasRef.current;
+    
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (const target of targets) {
+      target.draw(ctx);
+    }
+
+    ctx.fillText("1", 50, 200);
+    ctx.font = "30px Arial";
+    requestAnimationFrame(animate);
+  }, [ctx, targets]);
+
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+
+    setCtx(ctx);
+
+    canvas.addEventListener("click", (e) => {
+      console.log(e.pageX, e.pageY);
+      ctx.fillText(".", e.pageX, e.pageY);
+      // For index add logic if it is wrong from spawner
+      if (idx === questions.length - 1) {
+        setIdx(0);
+      } else {
+        setIdx((previousIdx) => {
+          return previousIdx + 1;
+        })
+      }
+      setTimeQuestion(120);
+      setScore((previousScore) => {
+        return previousScore + 1;
+      })
+    });
+  }, [])
+
+  React.useEffect(() => {
+    if (ctx) {animate(0)}
+  }, [ctx])
+
+
   return (
-    //
-    <iframe src='https://codepen.io/MillerTime/embed/BexBbE?2Cresult'></iframe>
-  );
-};
+    <canvas ref={canvasRef} width="1000" height="1000"></canvas>
+  )
+}
+
+
+
+
+
 export default Game;
