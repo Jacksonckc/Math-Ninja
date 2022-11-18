@@ -1,8 +1,8 @@
 import { amber, blue, blueGrey, brown, cyan, deepOrange, deepPurple, green, grey, indigo, lightBlue, lightGreen, lime, orange, pink, purple, red, teal, yellow } from "@mui/material/colors";
-import Vector from "vector.js"; 
+import Vector from "./vector.js"; 
 
 
-GRAVITY = 0.3;
+const GRAVITY = 0.3;
 
 export class Target {
   colorArray = [amber, blue, blueGrey, brown, cyan, deepOrange, deepPurple, green, grey, indigo, lightBlue, lightGreen, lime, orange, pink, purple, red, teal, yellow]
