@@ -2,7 +2,7 @@ import { amber, blue, blueGrey, brown, cyan, deepOrange, deepPurple, green, grey
 import Vector from "vector.js"; 
 
 
-GRAVITY = 0.5;
+GRAVITY = 0.3;
 
 export class Target {
   colorArray = [amber, blue, blueGrey, brown, cyan, deepOrange, deepPurple, green, grey, indigo, lightBlue, lightGreen, lime, orange, pink, purple, red, teal, yellow]
