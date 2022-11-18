@@ -1,89 +1,65 @@
-import React from 'react';
-
-import { Target } from '../game_src/target';
-
+import { React, useEffect, useRef, useState } from "react";
 
 function Game() {
-  const [score, setScore] = React.useState(0);
-  const [playerLives, setPlayerLives] = React.useState(3);
+  const canvasRef = useRef(null);
+  const contextRef = useRef(null);
+  const [isDrawing, setIsDrawing] = useState(false);
 
-  const [idx, setIdx] = React.useState(0);
-  const lastTime = React.useRef(0);
-
-
-  const [questions, setQuestions] = React.useState([
-    { answer: 3, question: "1 + 2" },
-    { answer: 4, question: "2 + 2" },
-    { answer: 4, question: "3 + 1" },
-  ]);
-
-  const [timeQuestion, setTimeQuestion] = React.useState(120);
-
-  const [targets, setTargets] = React.useState([
-    new Target(9, true),
-    new Target(3, false),
-    new Target(1, false),
-  ])
-
-
-
-
-
-  const canvasRef = React.useRef()
-  const [ctx, setCtx] = React.useState();
-
-  const animate = React.useCallback((timestamp) => {
-    lastTime.current = timestamp;
-
+  useEffect(() => {
     const canvas = canvasRef.current;
-    
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    canvas.width = window.innerWidth * 2;
+    canvas.height = window.innerHeight * 2;
+    canvas.style.height = `${window.innerHeight}px`;
+    canvas.style.width = `${window.innerWidth}px`;
 
-    for (const target of targets) {
-      target.draw(ctx);
+    const context = canvas.getContext("2d");
+    context.scale(2, 2);
+    context.lineCap = "round";
+    context.strokeStyle = "black";
+    context.lineWidth = 5;
+    contextRef.current = context;
+  }, []);
+
+  const startDrawing = ({ nativeEvent }) => {
+    const { offsetX, offsetY } = nativeEvent;
+    contextRef.current.beginPath();
+    contextRef.current.moveTo(offsetX, offsetY);
+    setIsDrawing(true);
+  };
+
+  const finishDrawing = () => {
+    contextRef.current.closePath();
+    setIsDrawing(false);
+  };
+
+  const draw = ({ nativeEvent }) => {
+    if (!isDrawing) {
+      return;
     }
+    const { offsetX, offsetY } = nativeEvent;
+    contextRef.current.lineTo(offsetX, offsetY);
+    contextRef.current.stroke();
+  };
 
-    ctx.fillText("1", 50, 200);
-    ctx.font = "30px Arial";
-    requestAnimationFrame(animate);
-  }, [ctx, targets]);
-
-  React.useEffect(() => {
+  const clearCanvas = () => {
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-
-    setCtx(ctx);
-
-    canvas.addEventListener("click", (e) => {
-      console.log(e.pageX, e.pageY);
-      ctx.fillText(".", e.pageX, e.pageY);
-      // For index add logic if it is wrong from spawner
-      if (idx === questions.length - 1) {
-        setIdx(0);
-      } else {
-        setIdx((previousIdx) => {
-          return previousIdx + 1;
-        })
-      }
-      setTimeQuestion(120);
-      setScore((previousScore) => {
-        return previousScore + 1;
-      })
-    });
-  }, [])
-
-  React.useEffect(() => {
-    if (ctx) {animate(0)}
-  }, [ctx])
-
-
+    const context = canvas.getContext("2d");
+    context.fillStyle = "white";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+  };
   return (
-    <canvas ref={canvasRef} width="1000" height="1000"></canvas>
-  )
+    <div>
+      <canvas
+        onMouseDown={startDrawing}
+        onMouseUp={finishDrawing}
+        onMouseMove={draw}
+        ref={canvasRef}
+      />
+      <button type="button" onClick={clearCanvas}>
+        Clear
+      </button>
+    </div>
+  );
 }
-
-
-
-
 
 export default Game;
