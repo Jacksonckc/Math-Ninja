@@ -2,7 +2,7 @@ import { amber, blue, blueGrey, brown, cyan, deepOrange, deepPurple, green, grey
 import Vector from "./vector.js"; 
 
 
-const GRAVITY = 0.3;
+const GRAVITY = 0.2;
 
 export class Target {
   colorArray = [amber, blue, blueGrey, brown, cyan, deepOrange, deepPurple, green, grey, indigo, lightBlue, lightGreen, lime, orange, pink, purple, red, teal, yellow]
@@ -17,7 +17,7 @@ export class Target {
     // Sets the velocity based on the speed parameter
     this.velocity = new Vector(Math.random() * speed / 1.5, -Math.random() * 15 - 5); // TODO Brandon
 
-    this.active = false
+    this.active = true
   }
 
   draw(ctx) {
