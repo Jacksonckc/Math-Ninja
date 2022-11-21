@@ -41,7 +41,7 @@ export class Target {
     // gravity will bring the target back on screen.
     if (this.velocity.y > 0 &&
         ((this.position.x < 0 || this.position.x > ctx.canvas.width) ||
-        (/*ignore the ceiling*/  this.position.y > ctx.canvasHeight))) {
+        (/*ignore the ceiling*/  this.position.y > ctx.canvas.height))) {
       destroyCallback(this);
       this.active = false;
     }
