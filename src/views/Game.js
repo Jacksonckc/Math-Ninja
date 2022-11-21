@@ -20,9 +20,9 @@ function Game() {
   const [timeQuestion, setTimeQuestion] = React.useState(120);
 
   const [targets, setTargets] = React.useState([
-    new Target(9, true),
-    new Target(3, false),
-    new Target(1, false),
+    new Target(9, true, 20, 500, 500),
+    new Target(3, false, 20, 500, 500),
+    new Target(1, false, 20, 500, 500),
   ])
 
 
@@ -40,7 +40,7 @@ function Game() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     for (const target of targets) {
-      target.draw(ctx);
+      target.tick(ctx, (tar) => {console.log("Destroyed", tar)});
     }
 
     ctx.fillText("1", 50, 200);
