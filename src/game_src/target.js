@@ -22,7 +22,6 @@ export class Target {
 
   draw(ctx) {
     // Draw text to screen
-    //if (!this.active) return;
     ctx.fillText(this.value, this.position.x, this.position.y)
   }
 
