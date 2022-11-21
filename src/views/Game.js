@@ -20,9 +20,12 @@ function Game() {
   const [timeQuestion, setTimeQuestion] = React.useState(120);
 
   const [targets, setTargets] = React.useState([
-    new Target(9, true, 20, 500, 500),
-    new Target(3, false, 20, 500, 500),
-    new Target(1, false, 20, 500, 500),
+    new Target(9, true, 30, 500, 500),
+    new Target(3, false, 10, 500, 500),
+    new Target(1, false, 25, 500, 500),
+    new Target(7, false, 25, 500, 500),
+    new Target(9, false, 25, 500, 500),
+    new Target(0, false, 25, 500, 500),
   ])
 
 
@@ -44,7 +47,7 @@ function Game() {
     }
 
     ctx.fillText("1", 50, 200);
-    ctx.font = "30px Arial";
+    ctx.font = "50px Arial";
     requestAnimationFrame(animate);
   }, [ctx, targets]);
 
