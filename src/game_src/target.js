@@ -6,16 +6,14 @@ const GRAVITY = 0.2;
 
 export class Target {
   colorArray = [amber, blue, blueGrey, brown, cyan, deepOrange, deepPurple, green, grey, indigo, lightBlue, lightGreen, lime, orange, pink, purple, red, teal, yellow]
-  constructor(value, isCorrectAnswer, speed, canvasWidth, canvasHeight) {
-    const TARGET_SIZE = 10; // TODO
+  constructor(value, isCorrectAnswer, speed) {
+    this.size = 10; // TODO
 
     this.value = value;
     this.correct = isCorrectAnswer;
     this.color = this.colorArray[Math.floor(Math.random()*this.colorArray.length)];
 
-    this.position = new Vector(Math.random()*canvasWidth, canvasHeight + TARGET_SIZE);
-    // Sets the velocity based on the speed parameter
-    this.velocity = new Vector(Math.random() * speed / 1.5, -Math.random() * 15 - 5); // TODO Brandon
+    this.speed = speed;
 
     this.active = false
   }
@@ -53,7 +51,19 @@ export class Target {
     return this.correct;
   }
 
-  start() {
+  start(ctx) {
+    const canvasWidth = ctx.canvas.width;
+    const canvasHeight = ctx.canvas.height;
+
+    // Set a random starting position
+    this.position = new Vector(Math.random() * canvasWidth, canvasHeight + this.size);
+
+    const direction = this.position.x < (canvasWidth / 2) ? 1 : -1;
+
+    // Sets the velocity based on the speed parameter
+    this.velocity = new Vector(Math.random() * this.speed * direction, -Math.random() * 15 - 5);
+
+
     this.active = true;
   }
 }
