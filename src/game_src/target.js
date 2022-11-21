@@ -15,7 +15,7 @@ export class Target {
 
     this.position = new Vector(Math.random()*canvasWidth, canvasHeight + TARGET_SIZE);
     // Sets the velocity based on the speed parameter
-    this.velocity = new Vector(Math.random() * speed, -Math.random() * speed); // TODO Brandon
+    this.velocity = new Vector(Math.random() * speed / 1.5, -Math.random() * 15 - 5); // TODO Brandon
 
     this.active = false
   }
