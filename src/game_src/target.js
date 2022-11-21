@@ -17,7 +17,7 @@ export class Target {
     // Sets the velocity based on the speed parameter
     this.velocity = new Vector(Math.random() * speed / 1.5, -Math.random() * 15 - 5); // TODO Brandon
 
-    this.active = true
+    this.active = false
   }
 
   draw(ctx) {
