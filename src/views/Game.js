@@ -2,62 +2,61 @@ import { React, useEffect, useRef, useState } from "react";
 
 function Game() {
   const canvasRef = useRef(null);
-  const contextRef = useRef(null);
-  const [isDrawing, setIsDrawing] = useState(false);
+  var game_score = 0;
+  var lives = 3;
+
+  // draw game_score
+  const drawScore = (ctx) => {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.font = "50px serif";
+    ctx.fillText(`Score: ${game_score}`, 10, 50);
+  };
+
+  // draw heart
+  const drawHeart = (ctx, color) => {
+    ctx.lineWidth = 6;
+    ctx.strokeStyle = "#333";
+    ctx.beginPath();
+    ctx.moveTo(256, 111);
+    ctx.bezierCurveTo(358, 26, 446, 201, 273, 335);
+    ctx.moveTo(256, 111);
+    ctx.bezierCurveTo(137, 38, 99, 258, 273, 333);
+    ctx.stroke();
+    ctx.closePath();
+    ctx.fillStyle = "red";
+    ctx.fill();
+  };
+
+  const handleMouseDown = () => {
+    game_score++;
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    canvas.width = window.innerWidth * 2;
-    canvas.height = window.innerHeight * 2;
-    canvas.style.height = `${window.innerHeight}px`;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
     canvas.style.width = `${window.innerWidth}px`;
-
+    canvas.style.height = `${window.innerHeight}px`;
     const context = canvas.getContext("2d");
-    context.scale(2, 2);
-    context.lineCap = "round";
-    context.strokeStyle = "black";
-    context.lineWidth = 5;
-    contextRef.current = context;
-  }, []);
+    let frameCount = 0;
+    let animationFrameId;
 
-  const startDrawing = ({ nativeEvent }) => {
-    const { offsetX, offsetY } = nativeEvent;
-    contextRef.current.beginPath();
-    contextRef.current.moveTo(offsetX, offsetY);
-    setIsDrawing(true);
-  };
+    const render = () => {
+      frameCount++;
+      drawScore(context);
+      drawHeart(context);
+      animationFrameId = window.requestAnimationFrame(render);
+    };
+    render();
 
-  const finishDrawing = () => {
-    contextRef.current.closePath();
-    setIsDrawing(false);
-  };
+    return () => {
+      window.cancelAnimationFrame(animationFrameId);
+    };
+  }, [drawScore]);
 
-  const draw = ({ nativeEvent }) => {
-    if (!isDrawing) {
-      return;
-    }
-    const { offsetX, offsetY } = nativeEvent;
-    contextRef.current.lineTo(offsetX, offsetY);
-    contextRef.current.stroke();
-  };
-
-  const clearCanvas = () => {
-    const canvas = canvasRef.current;
-    const context = canvas.getContext("2d");
-    context.fillStyle = "white";
-    context.fillRect(0, 0, canvas.width, canvas.height);
-  };
   return (
     <div>
-      <canvas
-        onMouseDown={startDrawing}
-        onMouseUp={finishDrawing}
-        onMouseMove={draw}
-        ref={canvasRef}
-      />
-      <button type="button" onClick={clearCanvas}>
-        Clear
-      </button>
+      <canvas ref={canvasRef} onMouseDown={handleMouseDown} />
     </div>
   );
 }
