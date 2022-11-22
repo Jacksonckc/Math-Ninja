@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { Target } from '../game_src/target';
+import { spawn } from '../game_src/spawn.js'
 
 
 function Game() {
