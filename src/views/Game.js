@@ -1,4 +1,5 @@
 import { React, useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 
 function Game() {
   const canvasRef = useRef(null);
@@ -27,7 +28,34 @@ function Game() {
     ctx.fill();
   };
 
-  const handleMouseDown = () => {
+  const saveInfo = () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const difficulty = localStorage.getItem("difficulty");
+    const current_date = new Date();
+    const datetime = `${current_date.getDate()}/${
+      current_date.getMonth() + 1
+    }/${current_date.getFullYear()}@${current_date.getHours()}:${current_date.getMinutes()}:${current_date.getSeconds()}`;
+    const game_data = JSON.parse(localStorage.getItem("user_data"));
+
+    const newgame = {
+      timestamp: datetime,
+      game_score: game_score,
+      difficulty: difficulty,
+    };
+
+    const allgame =
+      game_data === null ? [newgame] : [...game_data.games, newgame];
+
+    const metadata = {
+      id: user.id,
+      games: allgame,
+    };
+    localStorage.setItem("user_data", JSON.stringify(metadata));
+  };
+
+  const handleMouseDown = ({ nativeEvent }) => {
+    const { offsetX, offsetY } = nativeEvent;
+    console.log(`X: ${offsetX}, Y: ${offsetY}`);
     game_score++;
   };
 
@@ -57,6 +85,10 @@ function Game() {
   return (
     <div>
       <canvas ref={canvasRef} onMouseDown={handleMouseDown} />
+      <button type="button" onClick={saveInfo}>
+        Save
+      </button>
+      <Link to="/">Home</Link>
     </div>
   );
 }
