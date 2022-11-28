@@ -1,28 +1,29 @@
-import React from 'react';
-import Button from '@mui/material/Button';
-import Stack from '@mui/material/Stack';
-import ButtonGroup from '@mui/material/ButtonGroup';
+import React from "react";
+import Button from "@mui/material/Button";
+import Stack from "@mui/material/Stack";
+import ButtonGroup from "@mui/material/ButtonGroup";
+import { Link } from "react-router-dom";
 
 const GameMode = () => {
   return (
     <div>
-      <div display='flex' justifyContent='center'>
-        <form id='GamemodeForm'>
+      <div display="flex" justifyContent="center">
+        <form id="GamemodeForm">
           <ButtonGroup
-            variant='contained'
-            orientation='vertical'
-            id='GamemodeButtonGroup'
+            variant="contained"
+            orientation="vertical"
+            id="GamemodeButtonGroup"
           >
-            <Button onClick={() => localStorage.setItem('difficulty', 'easy')}>
-              Easy
+            <Button onClick={() => localStorage.setItem("difficulty", "easy")}>
+              <Link to="/Game">Easy</Link>
             </Button>
             <Button
-              onClick={() => localStorage.setItem('difficulty', 'medium')}
+              onClick={() => localStorage.setItem("difficulty", "medium")}
             >
-              Medium
+              <Link to="/Game">Medium</Link>
             </Button>
-            <Button onClick={() => localStorage.setItem('difficulty', 'hard')}>
-              Hard
+            <Button onClick={() => localStorage.setItem("difficulty", "hard")}>
+              <Link to="/Game">Hard</Link>
             </Button>
           </ButtonGroup>
         </form>
