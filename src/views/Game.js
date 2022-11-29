@@ -35,7 +35,9 @@ function Game() {
     const datetime = `${current_date.getDate()}/${
       current_date.getMonth() + 1
     }/${current_date.getFullYear()}@${current_date.getHours()}:${current_date.getMinutes()}:${current_date.getSeconds()}`;
-    const game_data = JSON.parse(localStorage.getItem("user_data"));
+
+    // Get user at local storage
+    const user_data = JSON.parse(localStorage.getItem("user"));
 
     const newgame = {
       timestamp: datetime,
@@ -43,14 +45,14 @@ function Game() {
       difficulty: difficulty,
     };
 
-    const allgame =
-      game_data === null ? [newgame] : [...game_data.games, newgame];
+    const games =
+      user_data.hasOwnProperty("games") === false
+        ? [newgame]
+        : [...user_data.games, newgame];
 
-    const metadata = {
-      id: user.id,
-      games: allgame,
-    };
-    localStorage.setItem("user_data", JSON.stringify(metadata));
+    const metadata = { ...user_data, games };
+
+    localStorage.setItem("user", JSON.stringify(metadata));
   };
 
   const handleMouseDown = ({ nativeEvent }) => {
