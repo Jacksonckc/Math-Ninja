@@ -1,5 +1,6 @@
 import { amber, blue, blueGrey, brown, cyan, deepOrange, deepPurple, green, grey, indigo, lightBlue, lightGreen, lime, orange, pink, purple, red, teal, yellow } from "@mui/material/colors";
 import Vector from "./vector.js"; 
+import {useEffect, useState} from 'react';
 
 
 const GRAVITY = 0.2;
@@ -15,7 +16,7 @@ export class Target {
 
     this.position = new Vector(Math.random()*canvasWidth, canvasHeight + TARGET_SIZE);
     // Sets the velocity based on the speed parameter
-    this.velocity = new Vector(Math.random() * speed / 1.5, -Math.random() * 15 - 5); // TODO Brandon
+    this.velocity = new Vector(Math.random() * speed / 1.5, -Math.random() * 15 - 5);
 
     this.active = false
   }
