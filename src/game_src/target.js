@@ -67,4 +67,8 @@ export class Target {
 
     this.active = true;
   }
+
+  kill() {
+    active = false;
+  }
 }
