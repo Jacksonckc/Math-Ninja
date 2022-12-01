@@ -77,7 +77,6 @@ function Game() {
         });
       }
 
-      ctx.fillText("1", 50, 200);
       ctx.font = "50px Arial";
       requestAnimationFrame(animate);
     },
