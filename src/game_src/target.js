@@ -55,9 +55,11 @@ export class Target {
     if (mouseX >= (this.position.x - this.hitBoxRadius) && mouseX <= (this.position.x + this.hitBoxRadius) && 
     (mouseY >= (this.position.y - this.hitBoxRadius) && mouseY <= (this.position.y + this.hitBoxRadius))) {
       console.log("WITHIN HITBOX " + this.value);
-      return true;
-    } else {
-      return false;
+      if (this.isCorrect()) {
+        return true;
+      } else {
+        return false;
+      }
     }
   }
 

@@ -63,7 +63,11 @@ function Game() {
         console.log(`X: ${offsetX}, Y: ${offsetY}`);
       };
       for (const target of targets) {
-        target.isWithinHitBox(e.offsetX, e.offsetY);
+        if (target.isWithinHitBox(e.offsetX, e.offsetY)) {
+          //increase score here
+        } else {
+          //decrease score here
+        }
       };
 
       console.log(e.pageX, e.pageY);
