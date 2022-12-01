@@ -1,7 +1,5 @@
 import { amber, blue, blueGrey, brown, cyan, deepOrange, deepPurple, green, grey, indigo, lightBlue, lightGreen, lime, orange, pink, purple, red, teal, yellow } from "@mui/material/colors";
 import Vector from "./vector.js"; 
-import {useEffect, useState} from 'react';
-
 
 const GRAVITY = 0.2;
 
@@ -17,6 +15,7 @@ export class Target {
     this.speed = speed;
 
     this.active = false
+    this.hitBoxRadius = 100;
   }
 
   draw(ctx) {
@@ -25,7 +24,7 @@ export class Target {
   }
 
   tick(ctx, destroyCallback) {
-    if (!this.active) return;
+    if (!this.active) this.start(ctx);
 
     // https://github.com/Kaelinator/AGAD/blob/master/Fruit%20Ninja/Fruit.js
     // Update Position
@@ -50,6 +49,16 @@ export class Target {
   isCorrect() {
     if (!this.active) return;
     return this.correct;
+  }
+
+  isWithinHitBox(mouseX, mouseY) {
+    if (mouseX >= (this.position.x - this.hitBoxRadius) && mouseX <= (this.position.x + this.hitBoxRadius) && 
+    (mouseY >= (this.position.y - this.hitBoxRadius) && mouseY <= (this.position.y + this.hitBoxRadius))) {
+      console.log("WITHIN HITBOX " + this.value);
+      return true;
+    } else {
+      return false;
+    }
   }
 
   start(ctx) {
