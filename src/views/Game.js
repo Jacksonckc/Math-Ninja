@@ -1,5 +1,6 @@
 import { React, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { spawn } from "../game_src/spawn.js";
 
 function Game() {
   const canvasRef = useRef(null);
@@ -39,11 +40,14 @@ function Game() {
     // Get user at local storage
     const user_data = JSON.parse(localStorage.getItem("user"));
 
-    const newgame = {
-      timestamp: datetime,
-      game_score: game_score,
-      difficulty: difficulty,
-    };
+    const [targets, setTargets] = React.useState([
+      new Target(9, true, 30, 500, 500),
+      new Target(3, false, 10, 500, 500),
+      new Target(1, false, 25, 500, 500),
+      new Target(7, false, 25, 500, 500),
+      new Target(9, false, 25, 500, 500),
+      new Target(0, false, 25, 500, 500),
+    ]);
 
     const games =
       user_data.hasOwnProperty("games") === false
@@ -79,10 +83,46 @@ function Game() {
     };
     render();
 
-    return () => {
-      window.cancelAnimationFrame(animationFrameId);
-    };
-  }, [drawScore]);
+    for (const target of targets) {
+      target.tick(ctx, (tar) => {
+        console.log("Destroyed", tar);
+      });
+    }
+
+    ctx.fillText("1", 50, 200);
+    ctx.font = "50px Arial";
+    requestAnimationFrame(animate);
+  }, [ctx, targets]);
+
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+
+    setCtx(ctx);
+
+    canvas.addEventListener("click", (e) => {
+      console.log(e.pageX, e.pageY);
+      ctx.fillText(".", e.pageX, e.pageY);
+      // For index add logic if it is wrong from spawner
+      if (idx === questions.length - 1) {
+        setIdx(0);
+      } else {
+        setIdx((previousIdx) => {
+          return previousIdx + 1;
+        });
+      }
+      setTimeQuestion(120);
+      setScore((previousScore) => {
+        return previousScore + 1;
+      });
+    });
+  }, []);
+
+  React.useEffect(() => {
+    if (ctx) {
+      animate(0);
+    }
+  }, [ctx]);
 
   return (
     <div>

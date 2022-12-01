@@ -1,56 +1,69 @@
 import { amber, blue, blueGrey, brown, cyan, deepOrange, deepPurple, green, grey, indigo, lightBlue, lightGreen, lime, orange, pink, purple, red, teal, yellow } from "@mui/material/colors";
+import Vector from "./vector.js"; 
 
-class Target {
+
+const GRAVITY = 0.2;
+
+export class Target {
   colorArray = [amber, blue, blueGrey, brown, cyan, deepOrange, deepPurple, green, grey, indigo, lightBlue, lightGreen, lime, orange, pink, purple, red, teal, yellow]
-  constructor(value, isCorrectAnswer, speed, canvasWidth, canvaseHeight) {
-    const TARGET_SIZE = 10; // TODO
+  constructor(value, isCorrectAnswer, speed) {
+    this.size = 10; // TODO
 
     this.value = value;
     this.correct = isCorrectAnswer;
     this.color = this.colorArray[Math.floor(Math.random()*this.colorArray.length)];
 
-    if (Math.random() > 0.5) {
-      this.x = canvasWidth * Math.random();
-      this.y = Math.random() > 0.5 ? -TARGET_SIZE : canvaseHeight;
-    } else {
-      this.x = Math.random() > 0.5 ? -TARGET_SIZE : canvasWidth;
-      this.y = canvaseHeight * Math.random();
-    }
-    
-
-    this.m = 10; // TODO
-    this.b = 10; // TODO
-    this.v = speed;
+    this.speed = speed;
 
     this.active = false
   }
 
   draw(ctx) {
     // Draw text to screen
-    if (!this.active) return;
-    ctx.fillText(this.value, this.x, this.y)
+    ctx.fillText(this.value, this.position.x, this.position.y)
   }
 
-  tick(timestamp) {
+  tick(ctx, destroyCallback) {
     if (!this.active) return;
-    const deltaTime = timestamp - this.lastUpdate;
-    this.lastUpdate = timestamp
-    //const GRAVITY = 1; // TODO
-    //this.vy -= GRAVITY; // TODO
 
-    // Move according to velocity
-    this.x += this.vx;  
-    this.y += this.vy;
+    // https://github.com/Kaelinator/AGAD/blob/master/Fruit%20Ninja/Fruit.js
+    // Update Position
+    this.position.add(this.velocity);
+
+    // Update Velocity
+    this.velocity.x *= 0.99;
+    this.velocity.y += GRAVITY;
+    
+    // We do not destroy if we have gone above the ceiling (y < 0) because
+    // gravity will bring the target back on screen.
+    if (this.velocity.y > 0 &&
+        ((this.position.x < 0 || this.position.x > ctx.canvas.width) ||
+        (/*ignore the ceiling*/  this.position.y > ctx.canvas.height))) {
+      destroyCallback(this);
+      this.active = false;
+    }
+
+    this.draw(ctx);
   }
 
-  onClick() {
+  isCorrect() {
     if (!this.active) return;
-    console.log("Implement onClick in Target");
     return this.correct;
   }
 
-  start(timestamp) {
-    this.lastUpdate = timestamp;
+  start(ctx) {
+    const canvasWidth = ctx.canvas.width;
+    const canvasHeight = ctx.canvas.height;
+
+    // Set a random starting position
+    this.position = new Vector(Math.random() * canvasWidth, canvasHeight + this.size);
+
+    const direction = this.position.x < (canvasWidth / 2) ? 1 : -1;
+
+    // Sets the velocity based on the speed parameter
+    this.velocity = new Vector(Math.random() * this.speed * direction, -Math.random() * 15 - 5);
+
+
     this.active = true;
   }
 }
