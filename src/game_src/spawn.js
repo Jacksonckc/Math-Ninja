@@ -17,7 +17,7 @@ const VALS = {
     "speed": 10,
     "ops": ["+"]
   },
-  
+
   "medium": {
     "maxNumberSize": 100,
     "targetCount": 16,
@@ -56,24 +56,24 @@ export function spawn(difficulty) {
   const b = Math.round(Math.random() * VALS[difficulty].maxNumberSize
                                         * (operation == "/" ? DIV_REDUCT : 1)
                                         * (operation == "*" ? MULT_REDUCT : 1));
-  
+
   const answer = OPERATION_MAP[operation](a, b);
 
   // Division is a special case where a is used as the answer and the dividend is created by a * b
   // Create the equation string
   equation = `${operation == "/" ? (a * b) : a} ${operation} ${b} =`;
-  
-  
+
+
   // Generate a random index for the answer to be generated in the list of targets
   const iOfInsert = Math.floor(Math.random() * VALS[difficulty].targetCount)
-  
+
   // Generate all the targets
   for (let i = 0; i < VALS[difficulty].targetCount; i++) {
     if (i == iOfInsert) {
       targets.push(new Target(answer, true, VALS[difficulty].speed));
       continue;
     }
-    
+
     let falseAnswer = answer;
     // Never let a false target be the same value of the answer
     while (falseAnswer == answer) {

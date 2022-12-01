@@ -1,4 +1,6 @@
-import React from "react";
+import React from 'react';
+
+import { Target } from '../game_src/target';
 
 import { Target } from "../game_src/target";
 
@@ -91,6 +93,18 @@ function Game() {
     setCtx(ctx);
 
     canvas.addEventListener("click", (e) => {
+      const handleMouseDown = ({ nativeEvent }) => {
+        const { offsetX, offsetY } = nativeEvent;
+        console.log(`X: ${offsetX}, Y: ${offsetY}`);
+      };
+      for (const target of targets) {
+        if (target.isWithinHitBox(e.offsetX, e.offsetY)) {
+          //increase score here
+        } else {
+          //decrease score here
+        }
+      };
+
       console.log(e.pageX, e.pageY);
       console.log(score);
 
