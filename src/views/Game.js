@@ -2,8 +2,6 @@ import React from 'react';
 
 import { Target } from '../game_src/target';
 
-import { Target } from "../game_src/target";
-
 function Game() {
   const [score, setScore] = React.useState(0);
   const [playerLives, setPlayerLives] = React.useState(3);
