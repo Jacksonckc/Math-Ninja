@@ -58,6 +58,14 @@ function Game() {
     setCtx(ctx);
 
     canvas.addEventListener("click", (e) => {
+      const handleMouseDown = ({ nativeEvent }) => {
+        const { offsetX, offsetY } = nativeEvent;
+        console.log(`X: ${offsetX}, Y: ${offsetY}`);
+      };
+      for (const target of targets) {
+        target.isWithinHitBox(e.offsetX, e.offsetY);
+      };
+
       console.log(e.pageX, e.pageY);
       ctx.fillText(".", e.pageX, e.pageY);
       // For index add logic if it is wrong from spawner
