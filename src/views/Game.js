@@ -1,6 +1,6 @@
-import React from 'react';
+import React from "react";
 
-import { Target } from '../game_src/target';
+import { Target } from "../game_src/target";
 
 function Game() {
   const [score, setScore] = React.useState(0);
@@ -86,6 +86,10 @@ function Game() {
   React.useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    canvas.style.width = `${window.innerWidth}px`;
+    canvas.style.height = `${window.innerHeight}px`;
 
     setCtx(ctx);
 
@@ -100,7 +104,7 @@ function Game() {
         } else {
           //decrease score here
         }
-      };
+      }
 
       console.log(e.pageX, e.pageY);
       console.log(score);
@@ -129,7 +133,7 @@ function Game() {
 
   return (
     <div>
-      <canvas ref={canvasRef} width="1000" height="1000"></canvas>;
+      <canvas ref={canvasRef}></canvas>;
       <button type="button" onClick={saveInfo}>
         Save
       </button>
