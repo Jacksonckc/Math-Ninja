@@ -14,21 +14,21 @@ const VALS = {
   "easy": {
     "maxNumberSize": 10,
     "targetCount": 9,
-    "speed": 10,
+    "speed": 8,
     "ops": ["+"]
   },
 
   "medium": {
     "maxNumberSize": 100,
     "targetCount": 16,
-    "speed": 12,
+    "speed": 8,
     "ops": ["+", "-"]
   },
 
   "hard": {
     "maxNumberSize": 1000,
     "targetCount": 25,
-    "speed": 14,
+    "speed": 8,
     "ops": ["+", "-", "*", "/"]
   }
 }
