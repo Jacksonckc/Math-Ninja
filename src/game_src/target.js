@@ -1,26 +1,69 @@
-import { amber, blue, blueGrey, brown, cyan, deepOrange, deepPurple, green, grey, indigo, lightBlue, lightGreen, lime, orange, pink, purple, red, teal, yellow } from "@mui/material/colors";
-import Vector from "./vector.js"; 
+import {
+  amber,
+  blue,
+  blueGrey,
+  brown,
+  cyan,
+  deepOrange,
+  deepPurple,
+  green,
+  grey,
+  indigo,
+  lightBlue,
+  lightGreen,
+  lime,
+  orange,
+  pink,
+  purple,
+  red,
+  teal,
+  yellow,
+} from "@mui/material/colors";
+import Vector from "./vector.js";
 
 const GRAVITY = 0.2;
 
 export class Target {
-  colorArray = [amber, blue, blueGrey, brown, cyan, deepOrange, deepPurple, green, grey, indigo, lightBlue, lightGreen, lime, orange, pink, purple, red, teal, yellow]
+  colorArray = [
+    amber,
+    blue,
+    blueGrey,
+    brown,
+    cyan,
+    deepOrange,
+    deepPurple,
+    green,
+    grey,
+    indigo,
+    lightBlue,
+    lightGreen,
+    lime,
+    orange,
+    pink,
+    purple,
+    red,
+    teal,
+    yellow,
+  ];
   constructor(value, isCorrectAnswer, speed) {
     this.size = 10; // TODO
 
     this.value = value;
     this.correct = isCorrectAnswer;
-    this.color = this.colorArray[Math.floor(Math.random()*this.colorArray.length)];
+    this.color =
+      this.colorArray[Math.floor(Math.random() * this.colorArray.length)];
 
     this.speed = speed;
 
-    this.active = false
+    this.active = false;
     this.hitBoxRadius = 100;
   }
 
   draw(ctx) {
     // Draw text to screen
-    ctx.fillText(this.value, this.position.x, this.position.y)
+    ctx.font = "bold 50px serif";
+    ctx.fillStyle = "green";
+    ctx.fillText(this.value, this.position.x, this.position.y);
   }
 
   tick(ctx, destroyCallback) {
@@ -33,12 +76,15 @@ export class Target {
     // Update Velocity
     this.velocity.x *= 0.99;
     this.velocity.y += GRAVITY;
-    
+
     // We do not destroy if we have gone above the ceiling (y < 0) because
     // gravity will bring the target back on screen.
-    if (this.velocity.y > 0 &&
-        ((this.position.x < 0 || this.position.x > ctx.canvas.width) ||
-        (/*ignore the ceiling*/  this.position.y > ctx.canvas.height))) {
+    if (
+      this.velocity.y > 0 &&
+      (this.position.x < 0 ||
+        this.position.x > ctx.canvas.width ||
+        /*ignore the ceiling*/ this.position.y > ctx.canvas.height)
+    ) {
       destroyCallback(this);
       this.active = false;
     }
@@ -52,8 +98,12 @@ export class Target {
   }
 
   isWithinHitBox(mouseX, mouseY) {
-    if (mouseX >= (this.position.x - this.hitBoxRadius) && mouseX <= (this.position.x + this.hitBoxRadius) && 
-    (mouseY >= (this.position.y - this.hitBoxRadius) && mouseY <= (this.position.y + this.hitBoxRadius))) {
+    if (
+      mouseX >= this.position.x - this.hitBoxRadius &&
+      mouseX <= this.position.x + this.hitBoxRadius &&
+      mouseY >= this.position.y - this.hitBoxRadius &&
+      mouseY <= this.position.y + this.hitBoxRadius
+    ) {
       console.log("WITHIN HITBOX " + this.value);
       if (this.isCorrect()) {
         return true;
@@ -68,13 +118,18 @@ export class Target {
     const canvasHeight = ctx.canvas.height;
 
     // Set a random starting position
-    this.position = new Vector(Math.random() * canvasWidth, canvasHeight + this.size);
+    this.position = new Vector(
+      Math.random() * canvasWidth,
+      canvasHeight + this.size
+    );
 
-    const direction = this.position.x < (canvasWidth / 2) ? 1 : -1;
+    const direction = this.position.x < canvasWidth / 2 ? 1 : -1;
 
     // Sets the velocity based on the speed parameter
-    this.velocity = new Vector(Math.random() * this.speed * direction, -Math.random() * 15 - 5);
-
+    this.velocity = new Vector(
+      Math.random() * this.speed * direction,
+      -Math.random() * 15 - 5
+    );
 
     this.active = true;
   }
