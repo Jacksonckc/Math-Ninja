@@ -1,30 +1,23 @@
 import React from "react";
+import { spawn } from "../game_src/spawn";
 
 import { Target } from "../game_src/target";
 
 function Game() {
+  const paused = React.useRef(false);
+
   const [score, setScore] = React.useState(0);
   const [playerLives, setPlayerLives] = React.useState(3);
 
   const [idx, setIdx] = React.useState(0);
   const lastTime = React.useRef(0);
 
-  const [questions, setQuestions] = React.useState([
-    { answer: 3, question: "1 + 2" },
-    { answer: 4, question: "2 + 2" },
-    { answer: 4, question: "3 + 1" },
-  ]);
+  const [question, setQuestion] = React.useState("");
 
   const [timeQuestion, setTimeQuestion] = React.useState(120);
 
-  const [targets, setTargets] = React.useState([
-    new Target(9, true, 30, 500, 500),
-    new Target(3, false, 10, 500, 500),
-    new Target(1, false, 25, 500, 500),
-    new Target(7, false, 25, 500, 500),
-    new Target(9, false, 25, 500, 500),
-    new Target(0, false, 25, 500, 500),
-  ]);
+  const readyTargets = React.useRef([]);
+  const activeTargets = React.useRef([]);
 
   const canvasRef = React.useRef();
   const [ctx, setCtx] = React.useState();
@@ -66,21 +59,58 @@ function Game() {
     (timestamp) => {
       lastTime.current = timestamp;
 
+      
+
       const canvas = canvasRef.current;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       drawScore(ctx);
 
-      for (const target of targets) {
-        target.tick(ctx, (tar) => {
-          console.log("Destroyed", tar);
-        });
+      if (!(paused.current)) {
+        let activeCount;
+        switch (localStorage.getItem("difficulty") ?? "easy") {
+          case "easy":
+            activeCount = 3;
+            break;
+          case "medium":
+            activeCount = 4;
+            break;
+          case "hard":
+            activeCount = 5;
+            break;
+          default:
+            activeCount = 3;
+        }
+
+        if (activeTargets.current.length < activeCount) {
+          const count = activeCount - activeTargets.current.length;
+
+          for (let i = 0; i < count; i++) {
+            const targetToAdd = readyTargets.current.pop();
+            if (targetToAdd) {
+              targetToAdd.start(ctx);
+              activeTargets.current.push(targetToAdd);
+            }
+          }
+        }
+        const it = [];
+
+
+        for (const target of activeTargets.current) {
+          target.tick(ctx, (tar) => {
+            const index = activeTargets.current.indexOf(tar);
+            activeTargets.current.splice(tar, 1);
+            console.log("Destroyed", tar);
+          });
+        }
       }
+
+      
 
       ctx.font = "50px Arial";
       requestAnimationFrame(animate);
     },
-    [ctx, targets]
+    [ctx]
   );
 
   React.useEffect(() => {
@@ -93,12 +123,22 @@ function Game() {
 
     setCtx(ctx);
 
+    if (!question) {
+      const levelData = spawn(localStorage.getItem("difficulty") ?? "easy");
+      
+      readyTargets.current = levelData["targets"];
+      setQuestion(levelData["equation"]);
+    }
+
+
+    
+
     canvas.addEventListener("click", (e) => {
       const handleMouseDown = ({ nativeEvent }) => {
         const { offsetX, offsetY } = nativeEvent;
         console.log(`X: ${offsetX}, Y: ${offsetY}`);
       };
-      for (const target of targets) {
+      for (const target of activeTargets.current) {
         if (target.isWithinHitBox(e.offsetX, e.offsetY)) {
           //increase score here
         } else {
@@ -110,14 +150,9 @@ function Game() {
       console.log(score);
 
       ctx.fillText(".", e.pageX, e.pageY);
-      // For index add logic if it is wrong from spawner
-      if (idx === questions.length - 1) {
-        setIdx(0);
-      } else {
-        setIdx((previousIdx) => {
-          return previousIdx + 1;
-        });
-      }
+      
+      // TODO generate next question
+      
       setTimeQuestion(120);
       setScore((new_score) => {
         return (new_score += 1);
