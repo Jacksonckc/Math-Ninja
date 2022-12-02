@@ -12,9 +12,7 @@ function Game() {
 
   const lastTime = React.useRef(0);
 
-  const [question, setQuestion] = React.useState("");
-
-  const [timeQuestion, setTimeQuestion] = React.useState(120);
+  const question = React.useRef("");
 
   const readyTargets = React.useRef([]);
   const activeTargets = React.useRef([]);
@@ -40,13 +38,13 @@ function Game() {
     const levelData = spawn(localStorage.getItem("difficulty") ?? "easy");
       
     readyTargets.current = levelData["targets"];
-    setQuestion(levelData["equation"]);
-
+    question.current = levelData["equation"];
+    
     console.log(levelData["equation"]);
   }
 
   // save info to local storage
-  const saveInfo = () => {
+  const saveInfo = React.useCallback(() => {
     const difficulty = localStorage.getItem("difficulty");
     const current_date = new Date();
     const datetime = `${current_date.getDate()}/${
@@ -58,7 +56,7 @@ function Game() {
 
     const newgame = {
       timestamp: datetime,
-      game_score: score,
+      game_score: score.current,
       difficulty: difficulty,
     };
 
@@ -70,9 +68,9 @@ function Game() {
     const metadata = { ...user_data, games };
 
     localStorage.setItem("user", JSON.stringify(metadata));
-  };
+  }, []);
 
-  const handleMouseDown = ({ nativeEvent }) => {
+  const handleMouseDown = React.useCallback(({ nativeEvent }) => {
     const { offsetX, offsetY } = nativeEvent;
     console.log(`X: ${offsetX}, Y: ${offsetY}`);
     for (const target of activeTargets.current) {
@@ -83,10 +81,8 @@ function Game() {
         playerLives.current = playerLives.current - 1;
       }
     }
-    // For index add logic if it is wrong from spawner
     // TODO on victory, generate new level
-    setTimeQuestion(120);
-  };
+  }, []);
 
   const animate = React.useCallback(
     (timestamp) => {
@@ -130,8 +126,16 @@ function Game() {
 
         for (const target of activeTargets.current) {
           target.tick(ctx, (tar) => {
+            // Remove self from activeTargets
             const index = activeTargets.current.indexOf(tar);
             activeTargets.current.splice(index, 1);
+
+            // Check if was correct answer
+            if (tar.isCorrect()) {
+              // TODO loose a life and start new round
+              console.log("Correct answer went off screen!");
+            }
+            
             console.log("Destroyed", tar);
           });
         }
@@ -158,7 +162,7 @@ function Game() {
   }, []);
 
   React.useEffect(() => {
-    if (!question) {
+    if (!question.current) {
       startNewLevel();
     }
   }, []);
