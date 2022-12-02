@@ -36,7 +36,8 @@ function Game() {
 
   const startNewLevel = () => {
     const levelData = spawn(localStorage.getItem("difficulty") ?? "easy");
-      
+    
+    activeTargets.current = [];
     readyTargets.current = levelData["targets"];
     question.current = levelData["equation"];
     
@@ -75,13 +76,20 @@ function Game() {
     console.log(`X: ${offsetX}, Y: ${offsetY}`);
     for (const target of activeTargets.current) {
       if (target.isWithinHitBox(offsetX, offsetY)) {
+        target.kill();
         score.current = score.current + 1;
+        
+        // Generate new level
+        startNewLevel();
+
+        // Stop looping
+        break;
       } else {
         //decrease score here
         playerLives.current = playerLives.current - 1;
       }
     }
-    // TODO on victory, generate new level
+    
   }, []);
 
   const animate = React.useCallback(
