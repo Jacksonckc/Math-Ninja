@@ -24,7 +24,7 @@ export class Target {
   }
 
   tick(ctx, destroyCallback) {
-    if (!this.active) this.start(ctx);
+    if (!this.active) return;
 
     // https://github.com/Kaelinator/AGAD/blob/master/Fruit%20Ninja/Fruit.js
     // Update Position
