@@ -36,6 +36,15 @@ function Game() {
     ctx.fillText(`Player Lives: ${playerLives.current}`, 10, 650);
   };
 
+  const startNewLevel = () => {
+    const levelData = spawn(localStorage.getItem("difficulty") ?? "easy");
+      
+    readyTargets.current = levelData["targets"];
+    setQuestion(levelData["equation"]);
+
+    console.log(levelData["equation"]);
+  }
+
   // save info to local storage
   const saveInfo = () => {
     const difficulty = localStorage.getItem("difficulty");
@@ -83,8 +92,6 @@ function Game() {
     (timestamp) => {
       lastTime.current = timestamp;
 
-      
-
       const canvas = canvasRef.current;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -124,7 +131,7 @@ function Game() {
         for (const target of activeTargets.current) {
           target.tick(ctx, (tar) => {
             const index = activeTargets.current.indexOf(tar);
-            activeTargets.current.splice(tar, 1);
+            activeTargets.current.splice(index, 1);
             console.log("Destroyed", tar);
           });
         }
@@ -152,10 +159,7 @@ function Game() {
 
   React.useEffect(() => {
     if (!question) {
-      const levelData = spawn(localStorage.getItem("difficulty") ?? "easy");
-      
-      readyTargets.current = levelData["targets"];
-      setQuestion(levelData["equation"]);
+      startNewLevel();
     }
   }, []);
 
