@@ -1,10 +1,11 @@
 import React from "react";
 
 import { Target } from "../game_src/target";
+import "../game_src/style.css";
 
 function Game() {
-  const [score, setScore] = React.useState(0);
-  const [playerLives, setPlayerLives] = React.useState(3);
+  var score = React.useRef(0);
+  var playerLives = React.useRef(3);
 
   const [idx, setIdx] = React.useState(0);
   const lastTime = React.useRef(0);
@@ -18,12 +19,12 @@ function Game() {
   const [timeQuestion, setTimeQuestion] = React.useState(120);
 
   const [targets, setTargets] = React.useState([
-    new Target(9, true, 30, 500, 500),
-    new Target(3, false, 10, 500, 500),
-    new Target(1, false, 25, 500, 500),
-    new Target(7, false, 25, 500, 500),
-    new Target(9, false, 25, 500, 500),
-    new Target(0, false, 25, 500, 500),
+    new Target(9, true, 5, 500, 500),
+    new Target(3, false, 5, 500, 500),
+    new Target(1, false, 3, 500, 500),
+    new Target(7, false, 8, 500, 500),
+    new Target(9, false, 4, 500, 500),
+    new Target(0, false, 1, 500, 500),
   ]);
 
   const canvasRef = React.useRef();
@@ -32,7 +33,15 @@ function Game() {
   // draw game score
   const drawScore = (ctx) => {
     ctx.font = "50px serif";
-    ctx.fillText(`Score: ${score}`, 10, 50);
+    ctx.fillStyle = "orange";
+    ctx.fillText(`Score: ${score.current}`, 10, 50);
+  };
+
+  // draw lives
+  const drawLives = (ctx) => {
+    ctx.font = "30px serif";
+    ctx.fillStyle = "blue";
+    ctx.fillText(`Player Lives: ${playerLives.current}`, 10, 650);
   };
 
   // save info to local storage
@@ -62,6 +71,28 @@ function Game() {
     localStorage.setItem("user", JSON.stringify(metadata));
   };
 
+  const handleMouseDown = ({ nativeEvent }) => {
+    const { offsetX, offsetY } = nativeEvent;
+    console.log(`X: ${offsetX}, Y: ${offsetY}`);
+    for (const target of targets) {
+      if (target.isWithinHitBox(offsetX, offsetY)) {
+        score.current = score.current + 1;
+      } else {
+        //decrease score here
+        playerLives.current = playerLives.current - 1;
+      }
+    }
+    // For index add logic if it is wrong from spawner
+    if (idx === questions.length - 1) {
+      setIdx(0);
+    } else {
+      setIdx((previousIdx) => {
+        return previousIdx + 1;
+      });
+    }
+    setTimeQuestion(120);
+  };
+
   const animate = React.useCallback(
     (timestamp) => {
       lastTime.current = timestamp;
@@ -70,10 +101,14 @@ function Game() {
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       drawScore(ctx);
+      drawLives(ctx);
 
       for (const target of targets) {
+        if (!target.active) {
+          target.start(ctx);
+        }
         target.tick(ctx, (tar) => {
-          console.log("Destroyed", tar);
+          // console.log("Destroyed", tar);
         });
       }
 
@@ -86,43 +121,11 @@ function Game() {
   React.useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
+    setCtx(ctx);
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     canvas.style.width = `${window.innerWidth}px`;
     canvas.style.height = `${window.innerHeight}px`;
-
-    setCtx(ctx);
-
-    canvas.addEventListener("click", (e) => {
-      const handleMouseDown = ({ nativeEvent }) => {
-        const { offsetX, offsetY } = nativeEvent;
-        console.log(`X: ${offsetX}, Y: ${offsetY}`);
-      };
-      for (const target of targets) {
-        if (target.isWithinHitBox(e.offsetX, e.offsetY)) {
-          //increase score here
-        } else {
-          //decrease score here
-        }
-      }
-
-      console.log(e.pageX, e.pageY);
-      console.log(score);
-
-      ctx.fillText(".", e.pageX, e.pageY);
-      // For index add logic if it is wrong from spawner
-      if (idx === questions.length - 1) {
-        setIdx(0);
-      } else {
-        setIdx((previousIdx) => {
-          return previousIdx + 1;
-        });
-      }
-      setTimeQuestion(120);
-      setScore((new_score) => {
-        return (new_score += 1);
-      });
-    });
   }, []);
 
   React.useEffect(() => {
@@ -133,7 +136,11 @@ function Game() {
 
   return (
     <div>
-      <canvas ref={canvasRef}></canvas>;
+      <canvas
+        id="canvas"
+        ref={canvasRef}
+        onMouseDown={handleMouseDown}
+      ></canvas>
       <button type="button" onClick={saveInfo}>
         Save
       </button>
