@@ -127,7 +127,7 @@ export class Target {
 
     // Sets the velocity based on the speed parameter
     this.velocity = new Vector(
-      Math.random() * this.speed * direction,
+      Math.random() * this.speed * direction + 1 * direction,
       -Math.random() * 6 - 7
     );
 
