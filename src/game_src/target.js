@@ -21,7 +21,7 @@ import {
 } from "@mui/material/colors";
 import Vector from "./vector.js";
 
-const GRAVITY = 0.2;
+const GRAVITY = 0.1;
 
 export class Target {
   colorArray = [
@@ -128,7 +128,7 @@ export class Target {
     // Sets the velocity based on the speed parameter
     this.velocity = new Vector(
       Math.random() * this.speed * direction,
-      -Math.random() * 15 - 5
+      -Math.random() * 6 - 7
     );
 
     this.active = true;
