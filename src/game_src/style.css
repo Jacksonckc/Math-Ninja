@@ -1,6 +1,39 @@
 #canvas {
+  position: absolute;
   border: 3px solid black;
   width: 1000px;
   height: 1000px;
   background: radial-gradient(teal, rgb(1, 32, 32));
+  
+}
+
+body {
+  overflow: hidden;
+}
+
+#pause-button {
+  position: absolute;
+  top: 1em;
+  right: 3em;
+  transform: scale(1.5);
+  color: white;
+}
+
+#play-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: scale(4);
+  color: #90d22b;
+  z-index: 2;
+}
+
+#paused-overlay {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 1;
 }

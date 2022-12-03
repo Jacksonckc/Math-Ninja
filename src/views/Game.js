@@ -4,10 +4,16 @@ import { spawn } from "../game_src/spawn";
 import { Target } from "../game_src/target";
 import { Blade } from "../game_src/blade";
 import "../game_src/style.css";
+import { Button } from "@mui/material";
+
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
+import PauseIcon from '@mui/icons-material/Pause';
 
 function Game() {
-  const paused = React.useRef(false);
-
+  const isGameActive = React.useRef(false);
+  const [isPaused, setIsPaused] = React.useState(true)
+  const [isGameStarted, setIsGameStarted] = React.useState(false);
+  
   var score = React.useRef(0);
   var playerLives = React.useRef(3);
   var sword = new Blade("white");
@@ -45,6 +51,12 @@ function Game() {
     question.current = levelData["equation"];
     
     console.log(levelData["equation"]);
+  }
+
+  const setPaused = (newValue) => {
+    isGameActive.current = !newValue;
+    setIsPaused(newValue);
+    if (!newValue) setIsGameStarted(true);
   }
 
   // save info to local storage
@@ -122,7 +134,7 @@ function Game() {
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      if (!(paused.current)) {
+      if (isGameActive.current) {
         let activeCount;
         switch (localStorage.getItem("difficulty") ?? "easy") {
           case "easy":
@@ -192,9 +204,17 @@ function Game() {
 
   }, []);
 
+  // Setup the Game and Add event listener
   React.useEffect(() => {
+    // Conditional ensures that mounting twice does not mess up anything
     if (!question.current) {
       startNewLevel();
+
+      window.addEventListener("keydown", (e) => {
+        if (e.code == "Space") {
+          setPaused(isGameActive.current);
+        }
+      });
     }
   }, []);
 
@@ -204,8 +224,26 @@ function Game() {
     }
   }, [ctx]);
 
+  const pauseOverlay = (
+    <div id="paused-overlay"></div>
+  );
+
+  const playButton = (
+    <PlayCircleOutlineIcon
+      id="play-button"
+      onClick={() => setPaused(false) }
+    />
+  );
+
+  const pauseButton = (
+    <PauseIcon
+      id="pause-button"
+      onClick={() => setPaused(true) }
+    />
+  );
+
   return (
-    <div>
+    <div id="game-interface">
       <canvas
         id="canvas"
         ref={canvasRef}
@@ -213,9 +251,15 @@ function Game() {
         onMouseMove={swing}
         onMouseUp={endSwinging}
       ></canvas>
-      <button type="button" onClick={saveInfo}>
+      
+      <button
+        id="save-button"
+        onClick={saveInfo}
+      >
         Save
       </button>
+      {isPaused ? playButton : pauseButton}
+      {isPaused && isGameStarted ? pauseOverlay : null}
     </div>
   );
 }
