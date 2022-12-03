@@ -53,7 +53,7 @@ export function spawn(difficulty) {
                                         * (operation == "/" ? DIV_REDUCT : 1)
                                         * (operation == "*" ? MULT_REDUCT : 1));
 
-  const b = Math.round(Math.random() * VALS[difficulty].maxNumberSize
+  const b = Math.round(Math.random() * (VALS[difficulty].maxNumberSize - (operation == "-" ? VALS[difficulty].maxNumberSize - a : 0))
                                         * (operation == "/" ? DIV_REDUCT : 1)
                                         * (operation == "*" ? MULT_REDUCT : 1));
 
