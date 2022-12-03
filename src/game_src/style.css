@@ -2,5 +2,5 @@
   border: 3px solid black;
   width: 1000px;
   height: 1000px;
-  background: radial-gradient(#e66465, #9198e5);
+  background: radial-gradient(teal, rgb(1, 32, 32));
 }

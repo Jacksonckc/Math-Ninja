@@ -2,6 +2,7 @@ import React from "react";
 import { spawn } from "../game_src/spawn";
 
 import { Target } from "../game_src/target";
+import { Blade } from "../game_src/blade";
 import "../game_src/style.css";
 
 function Game() {
@@ -9,6 +10,8 @@ function Game() {
 
   var score = React.useRef(0);
   var playerLives = React.useRef(3);
+  var sword = new Blade("white");
+  var isSwinging = React.useRef(false);
 
   const lastTime = React.useRef(0);
 
@@ -23,14 +26,14 @@ function Game() {
   // draw game score
   const drawScore = (ctx) => {
     ctx.font = "50px serif";
-    ctx.fillStyle = "orange";
+    ctx.fillStyle = "white";
     ctx.fillText(`Score: ${score.current}`, 10, 50);
   };
 
   // draw lives
   const drawLives = (ctx) => {
     ctx.font = "30px serif";
-    ctx.fillStyle = "blue";
+    ctx.fillStyle = "white";
     ctx.fillText(`Player Lives: ${playerLives.current}`, 10, 650);
   };
 
@@ -71,7 +74,26 @@ function Game() {
     localStorage.setItem("user", JSON.stringify(metadata));
   }, []);
 
-  const handleMouseDown = React.useCallback(({ nativeEvent }) => {
+  // Mouse Handlers
+  const startSwinging = () => {
+    isSwinging.current = true;
+  };
+
+  const swing = ({ nativeEvent }) => {
+    const { offsetX, offsetY } = nativeEvent;
+    sword.swing(offsetX, offsetY);
+    if (isSwinging.current) {
+      for (const target of targets) {
+        sword.checkForSlice(target, offsetX, offsetY, score, playerLives);
+      }
+    }
+  };
+
+  const endSwinging = () => {
+    isSwinging.current = false;
+  };
+  
+  /*const handleMouseDown = React.useCallback(({ nativeEvent }) => {
     const { offsetX, offsetY } = nativeEvent;
     console.log(`X: ${offsetX}, Y: ${offsetY}`);
     for (const target of activeTargets.current) {
@@ -90,7 +112,7 @@ function Game() {
       }
     }
     
-  }, []);
+  }, []);*/
 
   const animate = React.useCallback(
     (timestamp) => {
@@ -99,8 +121,6 @@ function Game() {
       const canvas = canvasRef.current;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawScore(ctx);
-      drawLives(ctx);
 
       if (!(paused.current)) {
         let activeCount;
@@ -148,10 +168,15 @@ function Game() {
           });
         }
       }
+      drawScore(ctx);
+      drawLives(ctx);
+      sword.draw(ctx, isSwinging.current);
+      sword.update();
 
       
 
-      ctx.font = "50px Arial";
+      //ctx.font = "50px Arial";
+      
       requestAnimationFrame(animate);
     },
     [ctx]
@@ -186,7 +211,9 @@ function Game() {
       <canvas
         id="canvas"
         ref={canvasRef}
-        onMouseDown={handleMouseDown}
+        onMouseDown={startSwinging}
+        onMouseMove={swing}
+        onMouseUp={endSwinging}
       ></canvas>
       <button type="button" onClick={saveInfo}>
         Save
