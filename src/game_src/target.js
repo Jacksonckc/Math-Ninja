@@ -3,14 +3,11 @@ import Vector from "./vector.js";
 const GRAVITY = 0.2;
 
 export class Target {
-  colorArray = ["red", "blue", "green"];
   constructor(value, isCorrectAnswer, speed) {
     this.size = 10; // TODO
 
     this.value = value;
     this.correct = isCorrectAnswer;
-    this.color =
-      this.colorArray[Math.floor(Math.random() * this.colorArray.length) - 1];
 
     this.speed = speed;
 
@@ -20,9 +17,6 @@ export class Target {
 
   draw(ctx) {
     // Draw text to screen
-    ctx.font = "bold 50px serif";
-    ctx.fillStyle = this.color;
-    ctx.fillText(this.value, this.position.x - 12, this.position.y + 15);
     ctx.beginPath();
     ctx.arc(
       this.position.x,
@@ -31,7 +25,13 @@ export class Target {
       0,
       2 * Math.PI
     );
+    ctx.closePath();
     ctx.stroke();
+    ctx.fillStyle = "#1e1e70";
+    ctx.fill();
+    ctx.font = "bold 50px serif";
+    ctx.fillStyle = "white";
+    ctx.fillText(this.value, this.position.x - 12, this.position.y + 15);
   }
 
   tick(ctx, destroyCallback) {
