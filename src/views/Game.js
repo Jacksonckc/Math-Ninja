@@ -104,27 +104,6 @@ function Game() {
   const endSwinging = () => {
     isSwinging.current = false;
   };
-  
-  /*const handleMouseDown = React.useCallback(({ nativeEvent }) => {
-    const { offsetX, offsetY } = nativeEvent;
-    console.log(`X: ${offsetX}, Y: ${offsetY}`);
-    for (const target of activeTargets.current) {
-      if (target.isWithinHitBox(offsetX, offsetY)) {
-        target.kill();
-        score.current = score.current + 1;
-        
-        // Generate new level
-        startNewLevel();
-
-        // Stop looping
-        break;
-      } else {
-        //decrease score here
-        playerLives.current = playerLives.current - 1;
-      }
-    }
-    
-  }, []);*/
 
   const animate = React.useCallback(
     (timestamp) => {
