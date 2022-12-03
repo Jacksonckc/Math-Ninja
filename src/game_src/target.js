@@ -1,6 +1,6 @@
 import Vector from "./vector.js";
 
-const GRAVITY = 0.2;
+const GRAVITY = 0.1;
 
 export class Target {
   constructor(value, isCorrectAnswer, speed) {
@@ -97,8 +97,8 @@ export class Target {
 
     // Sets the velocity based on the speed parameter
     this.velocity = new Vector(
-      Math.random() * this.speed * direction,
-      -Math.random() * 15 - 5
+      Math.random() * this.speed * direction + 1 * direction,
+      -Math.random() * 6 - 7
     );
 
     this.active = true;

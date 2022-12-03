@@ -1,34 +1,24 @@
 import React from "react";
+import { spawn } from "../game_src/spawn";
 
 import { Target } from "../game_src/target";
 import { Blade } from "../game_src/blade";
 import "../game_src/style.css";
 
 function Game() {
+  const paused = React.useRef(false);
+
   var score = React.useRef(0);
   var playerLives = React.useRef(3);
   var sword = new Blade("white");
   var isSwinging = React.useRef(false);
 
-  const [idx, setIdx] = React.useState(0);
   const lastTime = React.useRef(0);
 
-  const [questions, setQuestions] = React.useState([
-    { answer: 3, question: "1 + 2" },
-    { answer: 4, question: "2 + 2" },
-    { answer: 4, question: "3 + 1" },
-  ]);
+  const question = React.useRef("");
 
-  const [timeQuestion, setTimeQuestion] = React.useState(120);
-
-  const [targets, setTargets] = React.useState([
-    new Target(9, true, 5, 500, 500),
-    new Target(3, false, 5, 500, 500),
-    new Target(1, false, 3, 500, 500),
-    new Target(7, false, 8, 500, 500),
-    new Target(5, false, 4, 500, 500),
-    new Target(0, false, 1, 500, 500),
-  ]);
+  const readyTargets = React.useRef([]);
+  const activeTargets = React.useRef([]);
 
   const canvasRef = React.useRef();
   const [ctx, setCtx] = React.useState();
@@ -47,8 +37,18 @@ function Game() {
     ctx.fillText(`Player Lives: ${playerLives.current}`, 10, 650);
   };
 
+  const startNewLevel = () => {
+    const levelData = spawn(localStorage.getItem("difficulty") ?? "easy");
+    
+    activeTargets.current = [];
+    readyTargets.current = levelData["targets"];
+    question.current = levelData["equation"];
+    
+    console.log(levelData["equation"]);
+  }
+
   // save info to local storage
-  const saveInfo = () => {
+  const saveInfo = React.useCallback(() => {
     const difficulty = localStorage.getItem("difficulty");
     const current_date = new Date();
     const datetime = `${current_date.getDate()}/${
@@ -60,7 +60,7 @@ function Game() {
 
     const newgame = {
       timestamp: datetime,
-      game_score: score,
+      game_score: score.current,
       difficulty: difficulty,
     };
 
@@ -72,7 +72,7 @@ function Game() {
     const metadata = { ...user_data, games };
 
     localStorage.setItem("user", JSON.stringify(metadata));
-  };
+  }, []);
 
   // Mouse Handlers
   const startSwinging = () => {
@@ -92,6 +92,27 @@ function Game() {
   const endSwinging = () => {
     isSwinging.current = false;
   };
+  
+  /*const handleMouseDown = React.useCallback(({ nativeEvent }) => {
+    const { offsetX, offsetY } = nativeEvent;
+    console.log(`X: ${offsetX}, Y: ${offsetY}`);
+    for (const target of activeTargets.current) {
+      if (target.isWithinHitBox(offsetX, offsetY)) {
+        target.kill();
+        score.current = score.current + 1;
+        
+        // Generate new level
+        startNewLevel();
+
+        // Stop looping
+        break;
+      } else {
+        //decrease score here
+        playerLives.current = playerLives.current - 1;
+      }
+    }
+    
+  }, []);*/
 
   const animate = React.useCallback(
     (timestamp) => {
@@ -101,31 +122,82 @@ function Game() {
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      for (const target of targets) {
-        if (!target.active) {
-          target.start(ctx);
+      if (!(paused.current)) {
+        let activeCount;
+        switch (localStorage.getItem("difficulty") ?? "easy") {
+          case "easy":
+            activeCount = 3;
+            break;
+          case "medium":
+            activeCount = 4;
+            break;
+          case "hard":
+            activeCount = 5;
+            break;
+          default:
+            activeCount = 3;
         }
-        target.tick(ctx, (tar) => {
-          // console.log("Destroyed", tar);
-        });
+
+        if (activeTargets.current.length < activeCount) {
+          const count = activeCount - activeTargets.current.length;
+
+          for (let i = 0; i < count; i++) {
+            const targetToAdd = readyTargets.current.pop();
+            if (targetToAdd) {
+              targetToAdd.start(ctx);
+              activeTargets.current.push(targetToAdd);
+            }
+          }
+        }
+        const it = [];
+
+
+        for (const target of activeTargets.current) {
+          target.tick(ctx, (tar) => {
+            // Remove self from activeTargets
+            const index = activeTargets.current.indexOf(tar);
+            activeTargets.current.splice(index, 1);
+
+            // Check if was correct answer
+            if (tar.isCorrect()) {
+              // TODO loose a life and start new round
+              console.log("Correct answer went off screen!");
+            }
+            
+            console.log("Destroyed", tar);
+          });
+        }
       }
       drawScore(ctx);
       drawLives(ctx);
       sword.draw(ctx, isSwinging.current);
       sword.update();
+
+      
+
+      //ctx.font = "50px Arial";
+      
       requestAnimationFrame(animate);
     },
-    [ctx, targets]
+    [ctx]
   );
 
   React.useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     setCtx(ctx);
+
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     canvas.style.width = `${window.innerWidth}px`;
     canvas.style.height = `${window.innerHeight}px`;
+
+  }, []);
+
+  React.useEffect(() => {
+    if (!question.current) {
+      startNewLevel();
+    }
   }, []);
 
   React.useEffect(() => {
