@@ -1,69 +1,37 @@
-import {
-  amber,
-  blue,
-  blueGrey,
-  brown,
-  cyan,
-  deepOrange,
-  deepPurple,
-  green,
-  grey,
-  indigo,
-  lightBlue,
-  lightGreen,
-  lime,
-  orange,
-  pink,
-  purple,
-  red,
-  teal,
-  yellow,
-} from "@mui/material/colors";
 import Vector from "./vector.js";
 
 const GRAVITY = 0.2;
 
 export class Target {
-  colorArray = [
-    amber,
-    blue,
-    blueGrey,
-    brown,
-    cyan,
-    deepOrange,
-    deepPurple,
-    green,
-    grey,
-    indigo,
-    lightBlue,
-    lightGreen,
-    lime,
-    orange,
-    pink,
-    purple,
-    red,
-    teal,
-    yellow,
-  ];
+  colorArray = ["red", "blue", "green"];
   constructor(value, isCorrectAnswer, speed) {
     this.size = 10; // TODO
 
     this.value = value;
     this.correct = isCorrectAnswer;
     this.color =
-      this.colorArray[Math.floor(Math.random() * this.colorArray.length)];
+      this.colorArray[Math.floor(Math.random() * this.colorArray.length) - 1];
 
     this.speed = speed;
 
     this.active = false;
-    this.hitBoxRadius = 100;
+    this.hitBoxRadius = 40;
   }
 
   draw(ctx) {
     // Draw text to screen
     ctx.font = "bold 50px serif";
-    ctx.fillStyle = "green";
-    ctx.fillText(this.value, this.position.x, this.position.y);
+    ctx.fillStyle = this.color;
+    ctx.fillText(this.value, this.position.x - 12, this.position.y + 15);
+    ctx.beginPath();
+    ctx.arc(
+      this.position.x,
+      this.position.y,
+      this.hitBoxRadius,
+      0,
+      2 * Math.PI
+    );
+    ctx.stroke();
   }
 
   tick(ctx, destroyCallback) {
@@ -105,11 +73,14 @@ export class Target {
       mouseY <= this.position.y + this.hitBoxRadius
     ) {
       console.log("WITHIN HITBOX " + this.value);
-      if (this.isCorrect()) {
-        return true;
-      } else {
-        return false;
-      }
+      return true;
+      // if (this.isCorrect()) {
+      //   return true;
+      // } else {
+      //   return false;
+      // }
+    } else {
+      return false;
     }
   }
 

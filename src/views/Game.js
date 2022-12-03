@@ -23,7 +23,7 @@ function Game() {
     new Target(3, false, 5, 500, 500),
     new Target(1, false, 3, 500, 500),
     new Target(7, false, 8, 500, 500),
-    new Target(9, false, 4, 500, 500),
+    new Target(5, false, 4, 500, 500),
     new Target(0, false, 1, 500, 500),
   ]);
 
@@ -75,11 +75,19 @@ function Game() {
     const { offsetX, offsetY } = nativeEvent;
     console.log(`X: ${offsetX}, Y: ${offsetY}`);
     for (const target of targets) {
-      if (target.isWithinHitBox(offsetX, offsetY)) {
+      if (
+        target.isWithinHitBox(offsetX, offsetY) &&
+        target.isCorrect() === true
+      ) {
         score.current = score.current + 1;
-      } else {
+        target.kill();
+      } else if (
+        target.isWithinHitBox(offsetX, offsetY) &&
+        target.isCorrect() === false
+      ) {
         //decrease score here
         playerLives.current = playerLives.current - 1;
+        target.kill();
       }
     }
     // For index add logic if it is wrong from spawner
