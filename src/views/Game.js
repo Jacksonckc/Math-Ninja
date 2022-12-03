@@ -83,7 +83,7 @@ function Game() {
     const { offsetX, offsetY } = nativeEvent;
     sword.swing(offsetX, offsetY);
     if (isSwinging.current) {
-      for (const target of targets) {
+      for (const target of activeTargets.current) {
         sword.checkForSlice(target, offsetX, offsetY, score, playerLives);
       }
     }
@@ -149,8 +149,6 @@ function Game() {
             }
           }
         }
-        const it = [];
-
 
         for (const target of activeTargets.current) {
           target.tick(ctx, (tar) => {
