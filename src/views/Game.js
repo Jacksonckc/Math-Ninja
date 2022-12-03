@@ -59,6 +59,11 @@ function Game() {
     if (!newValue) setIsGameStarted(true);
   }
 
+  const removeFromActive = (target) => {
+    const index = activeTargets.current.indexOf(target);
+    activeTargets.current.splice(index, 1);
+  }
+
   // save info to local storage
   const saveInfo = React.useCallback(() => {
     const difficulty = localStorage.getItem("difficulty");
@@ -144,16 +149,15 @@ function Game() {
         for (const target of activeTargets.current) {
           target.tick(ctx, (tar) => {
             // Remove self from activeTargets
-            const index = activeTargets.current.indexOf(tar);
-            activeTargets.current.splice(index, 1);
+            removeFromActive(tar);
 
             // Check if was correct answer
             if (tar.isCorrect()) {
-              // TODO loose a life and start new round
-              console.log("Correct answer went off screen!");
+              console.log("Correct answer fell. Generating new equation");
+
+              playerLives.current = playerLives.current - 1;
+              startNewLevel();
             }
-            
-            console.log("Destroyed", tar);
           });
         }
       }
