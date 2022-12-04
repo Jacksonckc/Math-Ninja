@@ -64,14 +64,13 @@ function Game() {
     activeTargets.current = [];
     readyTargets.current = levelData["targets"];
     question.current = levelData["equation"];
-
-    console.log(levelData["equation"]);
   };
 
-  const setPaused = (newValue) => {
-    isGameActive.current = !newValue;
-    setIsPaused(newValue);
-    if (!newValue) setIsGameStarted(true);
+  const setPaused = () => {
+    isGameActive.current = isPaused;
+    setIsPaused(!isPaused);
+    setIsGameOver(false);
+    if (isPaused) setIsGameStarted(true);
   };
 
   const removeFromActive = (target) => {
@@ -82,12 +81,13 @@ function Game() {
   // Checks if player is still alive
   const checkPlayerAlive = () => {
     if (playerLives.current === 0) {
-      setPaused(true);
+      isGameActive.current = false;
+      setIsGameOver(true);
       isSwinging.current = false;
       saveInfo();
       playerLives.current = 3;
       score.current = 0;
-      // Call Modal for Score Details
+      question.current = "";
     }
   };
 
@@ -204,8 +204,6 @@ function Game() {
 
             // Check if was correct answer
             if (tar.isCorrect()) {
-              console.log("Correct answer fell. Generating new equation");
-
               playerLives.current = playerLives.current - 1;
               startNewLevel();
             }
@@ -222,8 +220,8 @@ function Game() {
       //ctx.font = "50px Arial";
 
       requestAnimationFrame(animate);
-      // ADJUST 55 FOR PREFERENCE OF BLADE
-      gameTime.current += 55;
+      // ADJUST num FOR PREFERENCE OF BLADE
+      gameTime.current += 1;
     },
     [ctx]
   );
@@ -253,12 +251,10 @@ function Game() {
   const pauseOverlay = <div id="paused-overlay"></div>;
 
   const playButton = (
-    <PlayCircleOutlineIcon id="play-button" onClick={() => setPaused(false)} />
+    <PlayCircleOutlineIcon id="play-button" onClick={setPaused} />
   );
 
-  const pauseButton = (
-    <PauseIcon id="pause-button" onClick={() => setPaused(true)} />
-  );
+  const pauseButton = <PauseIcon id="pause-button" onClick={setPaused} />;
 
   return (
     <div id="game-interface">
@@ -273,12 +269,22 @@ function Game() {
         //   console.log("fired");
         // }}
       ></canvas>
-
-      <button id="save-button" onClick={saveInfo}>
-        Save
-      </button>
       {isPaused ? playButton : pauseButton}
-      {isPaused && isGameStarted ? pauseOverlay : null}
+      {!isGameStarted ? pauseOverlay : null}
+      {isGameOver ? (
+        <div className="game-over">
+          <div className="game-over__info">
+            <h1>GAME OVER</h1>
+            <p>
+              You scored {playerLives.current} on{" "}
+              {localStorage.getItem("difficulty")} difficulty.
+            </p>
+            <button type="button" onClick={setPaused}>
+              Play Again
+            </button>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
