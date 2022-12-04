@@ -12,10 +12,20 @@ export class Target {
     this.speed = speed;
 
     this.active = false;
-    this.hitBoxRadius = 40;
+    this.hitBoxRadius = 45;
+    this.offsetX = 8;
+    this.offsetY = 12;
   }
 
   draw(ctx) {
+    if (this.value >= 1000) {
+      this.offsetX = 35;
+    } else if (this.value >= 100) {
+      this.offsetX = 25;
+    } else if (this.value >= 10) {
+      this.offsetX = 18;
+    }
+
     // Draw text to screen
     ctx.beginPath();
     ctx.arc(
@@ -29,9 +39,14 @@ export class Target {
     ctx.stroke();
     ctx.fillStyle = "#1e1e70";
     ctx.fill();
-    ctx.font = "bold 50px serif";
+    ctx.font = "bold 35px serif";
+    ctx.textAlign = "left";
     ctx.fillStyle = "white";
-    ctx.fillText(this.value, this.position.x - 12, this.position.y + 15);
+    ctx.fillText(
+      this.value,
+      this.position.x - this.offsetX,
+      this.position.y + this.offsetY
+    );
   }
 
   tick(ctx, destroyCallback) {

@@ -6,20 +6,22 @@ import { Blade } from "../game_src/blade";
 import "../game_src/style.css";
 import { Button } from "@mui/material";
 
-import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
-import PauseIcon from '@mui/icons-material/Pause';
+import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
+import PauseIcon from "@mui/icons-material/Pause";
 
 function Game() {
   const isGameActive = React.useRef(false);
-  const [isPaused, setIsPaused] = React.useState(true)
+  const [isPaused, setIsPaused] = React.useState(true);
   const [isGameStarted, setIsGameStarted] = React.useState(false);
-  
+  const [isGameOver, setIsGameOver] = React.useState(false);
+
   var score = React.useRef(0);
   var playerLives = React.useRef(3);
-  var sword = new Blade("white");
+  var sword = React.useRef(new Blade("white"));
   var isSwinging = React.useRef(false);
 
   const lastTime = React.useRef(0);
+  const gameTime = React.useRef(0);
 
   const question = React.useRef("");
 
@@ -33,6 +35,7 @@ function Game() {
   const drawScore = (ctx) => {
     ctx.font = "50px serif";
     ctx.fillStyle = "white";
+    ctx.textAlign = "left";
     ctx.fillText(`Score: ${score.current}`, 10, 50);
   };
 
@@ -40,29 +43,53 @@ function Game() {
   const drawLives = (ctx) => {
     ctx.font = "30px serif";
     ctx.fillStyle = "white";
+    ctx.textAlign = "left";
     ctx.fillText(`Player Lives: ${playerLives.current}`, 10, 650);
   };
 
+  // draw Equation
+  const drawEquation = (ctx, equation) => {
+    const x = window.innerWidth / 2;
+    const y = window.innerHeight / 2;
+    ctx.font = "bold 50px serif";
+    ctx.fillStyle = "LightBlue";
+    ctx.textAlign = "center";
+    ctx.fillText(`${equation}`, x, y);
+  };
+
+  // Generate new equation
   const startNewLevel = () => {
     const levelData = spawn(localStorage.getItem("difficulty") ?? "easy");
-    
+
     activeTargets.current = [];
     readyTargets.current = levelData["targets"];
     question.current = levelData["equation"];
-    
-    console.log(levelData["equation"]);
-  }
+  };
 
-  const setPaused = (newValue) => {
-    isGameActive.current = !newValue;
-    setIsPaused(newValue);
-    if (!newValue) setIsGameStarted(true);
-  }
+  const setPaused = () => {
+    isGameActive.current = isPaused;
+    setIsPaused(!isPaused);
+    setIsGameOver(false);
+    if (isPaused) setIsGameStarted(true);
+  };
 
   const removeFromActive = (target) => {
     const index = activeTargets.current.indexOf(target);
     activeTargets.current.splice(index, 1);
-  }
+  };
+
+  // Checks if player is still alive
+  const checkPlayerAlive = () => {
+    if (playerLives.current === 0) {
+      isGameActive.current = false;
+      setIsGameOver(true);
+      isSwinging.current = false;
+      saveInfo();
+      playerLives.current = 3;
+      score.current = 0;
+      question.current = "";
+    }
+  };
 
   // save info to local storage
   const saveInfo = React.useCallback(() => {
@@ -97,17 +124,34 @@ function Game() {
   };
 
   const swing = ({ nativeEvent }) => {
-    const { offsetX, offsetY } = nativeEvent;
-    sword.swing(offsetX, offsetY);
     if (isSwinging.current) {
+      const { offsetX, offsetY } = nativeEvent;
+      sword.current.swing(offsetX, offsetY, isSwinging.current);
       for (const target of activeTargets.current) {
-        sword.checkForSlice(target, offsetX, offsetY, score, playerLives);
+        const answer = sword.current.checkForSlice(
+          target,
+          offsetX,
+          offsetY,
+          score,
+          playerLives
+        );
+        if (answer) {
+          question.current = "";
+        }
       }
     }
   };
 
   const endSwinging = () => {
     isSwinging.current = false;
+  };
+
+  // Handle Key Events
+  const handleKeyDown = (e) => {
+    if (e.code === "Space") {
+      setPaused(!isGameActive.current);
+    }
+    console.log("space");
   };
 
   const animate = React.useCallback(
@@ -117,6 +161,13 @@ function Game() {
       const canvas = canvasRef.current;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (!question.current) {
+        startNewLevel();
+      }
+
+      drawScore(ctx);
+      drawLives(ctx);
+      drawEquation(ctx, question.current);
 
       if (isGameActive.current) {
         let activeCount;
@@ -153,24 +204,24 @@ function Game() {
 
             // Check if was correct answer
             if (tar.isCorrect()) {
-              console.log("Correct answer fell. Generating new equation");
-
               playerLives.current = playerLives.current - 1;
               startNewLevel();
             }
           });
         }
+        sword.current.draw(ctx);
+        if (gameTime.current % 2 === 0) {
+          sword.current.update();
+        }
       }
-      drawScore(ctx);
-      drawLives(ctx);
-      sword.draw(ctx, isSwinging.current);
-      sword.update();
 
-      
+      checkPlayerAlive();
 
       //ctx.font = "50px Arial";
-      
+
       requestAnimationFrame(animate);
+      // ADJUST num FOR PREFERENCE OF BLADE
+      gameTime.current += 1;
     },
     [ctx]
   );
@@ -184,22 +235,12 @@ function Game() {
     canvas.height = window.innerHeight;
     canvas.style.width = `${window.innerWidth}px`;
     canvas.style.height = `${window.innerHeight}px`;
-
   }, []);
 
   // Setup the Game and Add event listener
-  React.useEffect(() => {
-    // Conditional ensures that mounting twice does not mess up anything
-    if (!question.current) {
-      startNewLevel();
-
-      window.addEventListener("keydown", (e) => {
-        if (e.code == "Space") {
-          setPaused(isGameActive.current);
-        }
-      });
-    }
-  }, []);
+  // React.useEffect(() => {
+  //   // Conditional ensures that mounting twice does not mess up anything
+  // }, []);
 
   React.useEffect(() => {
     if (ctx) {
@@ -207,42 +248,43 @@ function Game() {
     }
   }, [ctx]);
 
-  const pauseOverlay = (
-    <div id="paused-overlay"></div>
-  );
+  const pauseOverlay = <div id="paused-overlay"></div>;
 
   const playButton = (
-    <PlayCircleOutlineIcon
-      id="play-button"
-      onClick={() => setPaused(false) }
-    />
+    <PlayCircleOutlineIcon id="play-button" onClick={setPaused} />
   );
 
-  const pauseButton = (
-    <PauseIcon
-      id="pause-button"
-      onClick={() => setPaused(true) }
-    />
-  );
+  const pauseButton = <PauseIcon id="pause-button" onClick={setPaused} />;
 
   return (
     <div id="game-interface">
       <canvas
         id="canvas"
+        // tabIndex="0"
         ref={canvasRef}
         onMouseDown={startSwinging}
         onMouseMove={swing}
         onMouseUp={endSwinging}
+        // onKeyDown={() => {
+        //   console.log("fired");
+        // }}
       ></canvas>
-      
-      <button
-        id="save-button"
-        onClick={saveInfo}
-      >
-        Save
-      </button>
       {isPaused ? playButton : pauseButton}
-      {isPaused && isGameStarted ? pauseOverlay : null}
+      {!isGameStarted ? pauseOverlay : null}
+      {isGameOver ? (
+        <div className="game-over">
+          <div className="game-over__info">
+            <h1>GAME OVER</h1>
+            <p>
+              You scored {playerLives.current} on{" "}
+              {localStorage.getItem("difficulty")} difficulty.
+            </p>
+            <button type="button" onClick={setPaused}>
+              Play Again
+            </button>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
