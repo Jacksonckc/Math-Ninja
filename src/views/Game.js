@@ -11,8 +11,8 @@ import PauseIcon from "@mui/icons-material/Pause";
 
 function Game() {
   const isGameActive = React.useRef(false);
-  const [isPaused, setIsPaused] = React.useState(true);
-  const [isGameStarted, setIsGameStarted] = React.useState(false);
+  // handlers for game state
+  const [isGamePaused, setIsGamePaused] = React.useState(false);
   const [isGameOver, setIsGameOver] = React.useState(false);
 
   var score = React.useRef(0);
@@ -66,11 +66,22 @@ function Game() {
     question.current = levelData["equation"];
   };
 
+  // Handle Key Events
+  const handleKeyDown = (e) => {
+    if (e.code === "Space") {
+      setPaused();
+    }
+  };
+
   const setPaused = () => {
-    isGameActive.current = isPaused;
-    setIsPaused(!isPaused);
-    setIsGameOver(false);
-    if (isPaused) setIsGameStarted(true);
+    isGameActive.current = !isGameActive.current;
+    setIsGamePaused(!isGamePaused);
+    if (isGameOver === true) {
+      playerLives.current = 3;
+      score.current = 0;
+      question.current = "";
+      setIsGameOver(false);
+    }
   };
 
   const removeFromActive = (target) => {
@@ -81,13 +92,10 @@ function Game() {
   // Checks if player is still alive
   const checkPlayerAlive = () => {
     if (playerLives.current === 0) {
-      isGameActive.current = false;
       setIsGameOver(true);
+      setIsGamePaused(true);
       isSwinging.current = false;
       saveInfo();
-      playerLives.current = 3;
-      score.current = 0;
-      question.current = "";
     }
   };
 
@@ -146,14 +154,6 @@ function Game() {
     isSwinging.current = false;
   };
 
-  // Handle Key Events
-  const handleKeyDown = (e) => {
-    if (e.code === "Space") {
-      setPaused(!isGameActive.current);
-    }
-    console.log("space");
-  };
-
   const animate = React.useCallback(
     (timestamp) => {
       lastTime.current = timestamp;
@@ -161,14 +161,11 @@ function Game() {
       const canvas = canvasRef.current;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      if (!question.current) {
-        startNewLevel();
-      }
 
       drawScore(ctx);
       drawLives(ctx);
-      drawEquation(ctx, question.current);
 
+      // animate only if the game is active
       if (isGameActive.current) {
         let activeCount;
         switch (localStorage.getItem("difficulty") ?? "easy") {
@@ -184,6 +181,12 @@ function Game() {
           default:
             activeCount = 3;
         }
+
+        if (!question.current) {
+          startNewLevel();
+        }
+
+        drawEquation(ctx, question.current);
 
         if (activeTargets.current.length < activeCount) {
           const count = activeCount - activeTargets.current.length;
@@ -237,52 +240,41 @@ function Game() {
     canvas.style.height = `${window.innerHeight}px`;
   }, []);
 
-  // Setup the Game and Add event listener
-  // React.useEffect(() => {
-  //   // Conditional ensures that mounting twice does not mess up anything
-  // }, []);
-
   React.useEffect(() => {
     if (ctx) {
       animate(0);
-      window.addEventListener("keydown", (e) => {
-        if (e.code === "Space") {
-          setPaused();
-        }
-      });
     }
   }, [ctx]);
 
-  const pauseOverlay = <div id="paused-overlay"></div>;
-
-  const playButton = (
-    <PlayCircleOutlineIcon id="play-button" onClick={setPaused} />
-  );
-
-  const pauseButton = <PauseIcon id="pause-button" onClick={setPaused} />;
-
   return (
-    <div id="game-interface">
+    <div id="game-interface" tabIndex="0" onKeyDown={handleKeyDown}>
       <canvas
         id="canvas"
-        // tabIndex="0"
         ref={canvasRef}
         onMouseDown={startSwinging}
         onMouseMove={swing}
         onMouseUp={endSwinging}
-        // onKeyDown={() => {
-        //   console.log("fired");
-        // }}
       ></canvas>
-      {isPaused ? playButton : pauseButton}
-      {!isGameStarted ? pauseOverlay : null}
+      {!isGameOver && !isGamePaused ? (
+        <PlayCircleOutlineIcon
+          id="play-button"
+          onClick={setPaused}
+          style={{ display: !isGamePaused ? "block" : "none" }}
+        />
+      ) : (
+        <PauseIcon
+          id="pause-button"
+          onClick={setPaused}
+          style={{ display: isGamePaused ? "block" : "none" }}
+        />
+      )}
       {isGameOver ? (
         <div className="game-over">
           <div className="game-over__info">
             <h1>GAME OVER</h1>
             <p>
-              You scored {score.current} on {localStorage.getItem("difficulty")}{" "}
-              difficulty.
+              You scored {score.current} on{" "}
+              {localStorage.getItem("difficulty").toUpperCase()} difficulty.
             </p>
             <button type="button" onClick={setPaused}>
               Play Again

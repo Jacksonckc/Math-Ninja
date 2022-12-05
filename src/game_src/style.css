@@ -4,6 +4,7 @@
   width: 1000px;
   height: 1000px;
   background: radial-gradient(teal, rgb(1, 32, 32));
+  z-index: 0;
   
 }
 
@@ -17,6 +18,7 @@ body {
   right: 3em;
   transform: scale(1.5);
   color: white;
+  z-index: 2;
 }
 
 #play-button {
