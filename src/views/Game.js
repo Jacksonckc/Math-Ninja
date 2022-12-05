@@ -100,7 +100,7 @@ function Game() {
 
   // Checks if player is still alive
   const checkPlayerAlive = () => {
-    if (playerLives.current <= 0 && !isGameOver) {
+    if (playerLives.current <= 0 && !isGameOverRef.current) {
       setIsGameOver(true);
       isGameOverRef.current = true;
       isSwinging.current = false;
