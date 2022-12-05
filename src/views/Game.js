@@ -15,6 +15,8 @@ function Game() {
   const [isGamePaused, setIsGamePaused] = React.useState(false);
   const [isGameOver, setIsGameOver] = React.useState(false);
 
+  const isGameOverRef = React.useRef(false);
+
   var score = React.useRef(0);
   var playerLives = React.useRef(3);
   var sword = React.useRef(new Blade("white"));
@@ -77,11 +79,13 @@ function Game() {
     isGameActive.current = !isGameActive.current;
     setIsGamePaused(!isGamePaused);
     if (isGameOver === true) {
-      setIsGameOver(false);
+      console.log("Ran reset")
       saveInfo();
       score.current = 0;
       playerLives.current = 3;
       question.current = "";
+      setIsGameOver(false);
+      isGameOverRef.current = false;
     }
   };
 
@@ -92,8 +96,9 @@ function Game() {
 
   // Checks if player is still alive
   const checkPlayerAlive = () => {
-    if (playerLives.current === 0) {
+    if (playerLives.current === 0 && !isGameOver) {
       setIsGameOver(true);
+      isGameOverRef.current = true;
       setIsGamePaused(true);
       isSwinging.current = false;
     }
@@ -109,6 +114,9 @@ function Game() {
 
     // Get user at local storage
     const user_data = JSON.parse(localStorage.getItem("user"));
+
+    // Don't save the score if the user is not logged in
+    if (!user_data) return;
 
     const newgame = {
       timestamp: datetime,
@@ -137,14 +145,18 @@ function Game() {
       sword.current.swing(offsetX, offsetY, isSwinging.current);
       for (const target of activeTargets.current) {
         if (sword.current.checkForSlice(target, offsetX, offsetY)) {
+          // If target is already dead, do nothing
+          if (!target.kill()) return;
+          // Remove target from active targets
+          removeFromActive(target);
+
           if (target.isCorrect()) {
             score.current = score.current + 1;
+            startNewLevel();
           } else {
             //decrease score here
             playerLives.current = playerLives.current - 1;
           }
-          target.kill();
-          // TODO remove target from activeTargets
         }
       }
     }
@@ -207,7 +219,7 @@ function Game() {
 
             // Check if was correct answer
             if (tar.isCorrect()) {
-              playerLives.current = playerLives.current - 1;
+              playerLives.current = playerLives.current - (isGameOverRef.current ? 0 : 1);
               startNewLevel();
             }
           });

@@ -76,7 +76,6 @@ export class Target {
   }
 
   isCorrect() {
-    if (!this.active) return;
     return this.correct;
   }
 
@@ -120,6 +119,8 @@ export class Target {
   }
 
   kill() {
+    const didKill = this.active;
     this.active = false;
+    return didKill;
   }
 }
