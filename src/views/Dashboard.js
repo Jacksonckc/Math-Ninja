@@ -111,7 +111,7 @@ function DashboardContent() {
   const [page, setPage] = React.useState(<Profile />);
   const [open, setOpen] = React.useState(true);
   const [showNotification, setShowNotification] = React.useState(false);
-  console.log(showNotification);
+
   const navigate = useNavigate();
 
   const toggleDrawer = () => {
@@ -161,7 +161,7 @@ function DashboardContent() {
             >
               Dashboard
             </Typography>
-            <IconButton
+            {/* <IconButton
               color='inherit'
               onClick={() => {
                 setShowNotification(!showNotification);
@@ -171,7 +171,7 @@ function DashboardContent() {
               <Badge badgeContent={1} color='secondary'>
                 <NotificationsIcon />
               </Badge>
-            </IconButton>
+            </IconButton> */}
           </Toolbar>
         </AppBar>
         <Drawer variant='permanent' open={open}>

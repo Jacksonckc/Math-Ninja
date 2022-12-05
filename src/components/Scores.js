@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from '@mui/material/Link';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -8,17 +8,19 @@ import TableRow from '@mui/material/TableRow';
 import Title from './Title';
 
 // Generate Order Data
-function createData(id, date, name, score) {
-  return { id, date, name, score };
+function createData(id, time, score, difficulty) {
+  return { id, time, score, difficulty };
 }
 
-const rows = [
-  createData(0, '16 Mar, 2019', 'Elvis Presley', 312.44),
-  createData(1, '16 Mar, 2019', 'Paul McCartney', 866.99),
-  createData(2, '16 Mar, 2019', 'Tom Scholz', 100.81),
-  createData(3, '16 Mar, 2019', 'Michael Jackson', 654.39),
-  createData(4, '15 Mar, 2019', 'Bruce Springsteen', 212.79),
-];
+const gamesData = JSON.parse(localStorage.getItem('user')).games;
+console.log(gamesData);
+const rows = [];
+
+gamesData.forEach((data, index) => {
+  rows.push(
+    createData(index, data.timestamp, data.game_score, data.difficulty)
+  );
+});
 
 function preventDefault(event) {
   event.preventDefault();
@@ -32,7 +34,7 @@ export default function Scores() {
         <TableHead>
           <TableRow>
             <TableCell>Date</TableCell>
-            <TableCell>Name</TableCell>
+            <TableCell>Level</TableCell>
 
             <TableCell align='right'>Score</TableCell>
           </TableRow>
@@ -40,8 +42,8 @@ export default function Scores() {
         <TableBody>
           {rows.map((row) => (
             <TableRow key={row.id}>
-              <TableCell>{row.date}</TableCell>
-              <TableCell>{row.name}</TableCell>
+              <TableCell>{row.time}</TableCell>
+              <TableCell>{row.difficulty}</TableCell>
 
               <TableCell align='right'>{row.score}</TableCell>
             </TableRow>

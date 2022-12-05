@@ -19,7 +19,8 @@ const Profile = () => {
   }, []);
 
   useEffect(() => {
-    user && localStorage.setItem('user', JSON.stringify(user));
+    const cUser = { ...user, ...JSON.parse(localStorage.getItem('user')) };
+    user && localStorage.setItem('user', JSON.stringify(cUser));
   }, [user]);
 
   return (
