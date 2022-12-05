@@ -60,7 +60,7 @@ function Game() {
   };
 
   // Generate new equation
-  const startNewLevel = () => {
+  const generateNewLevel = () => {
     const levelData = spawn(localStorage.getItem("difficulty") ?? "easy");
 
     activeTargets.current = [];
@@ -88,7 +88,7 @@ function Game() {
 
     score.current = 0;
     playerLives.current = 3;
-    startNewLevel();
+    generateNewLevel();
     setIsGameOver(false);
     isGameOverRef.current = false;
   }
@@ -119,7 +119,7 @@ function Game() {
     // Get user at local storage
     const user_data = JSON.parse(localStorage.getItem("user"));
 
-    // Don't save the score if the user is not logged in
+    // Don't save the score if the user is not logged in (user object does not exist at this point)
     if (!user_data) return;
 
     const newgame = {
@@ -156,7 +156,7 @@ function Game() {
 
           if (target.isCorrect()) {
             score.current = score.current + 1;
-            startNewLevel();
+            generateNewLevel();
           } else {
             //decrease score here
             playerLives.current = playerLives.current - 1;
@@ -220,7 +220,7 @@ function Game() {
             // Check if was correct answer
             if (tar.isCorrect()) {
               playerLives.current = playerLives.current - (isGameOverRef.current ? 0 : 1);
-              startNewLevel();
+              generateNewLevel();
             }
           });
         }
@@ -251,7 +251,8 @@ function Game() {
     canvas.style.width = `${window.innerWidth}px`;
     canvas.style.height = `${window.innerHeight}px`;
 
-    if (!question.current) startNewLevel();
+    // Initial level generation
+    if (!question.current) generateNewLevel();
   }, []);
 
   React.useEffect(() => {
