@@ -245,6 +245,11 @@ function Game() {
   React.useEffect(() => {
     if (ctx) {
       animate(0);
+      window.addEventListener("keydown", (e) => {
+        if (e.code === "Space") {
+          setPaused();
+        }
+      });
     }
   }, [ctx]);
 
@@ -276,8 +281,8 @@ function Game() {
           <div className="game-over__info">
             <h1>GAME OVER</h1>
             <p>
-              You scored {playerLives.current} on{" "}
-              {localStorage.getItem("difficulty")} difficulty.
+              You scored {score.current} on {localStorage.getItem("difficulty")}{" "}
+              difficulty.
             </p>
             <button type="button" onClick={setPaused}>
               Play Again
