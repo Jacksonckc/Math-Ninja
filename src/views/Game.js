@@ -83,7 +83,7 @@ function Game() {
       saveInfo();
       score.current = 0;
       playerLives.current = 3;
-      question.current = "";
+      startNewLevel();
       setIsGameOver(false);
       isGameOverRef.current = false;
     }
@@ -194,10 +194,6 @@ function Game() {
             activeCount = 3;
         }
 
-        if (!question.current) {
-          startNewLevel();
-        }
-
         drawEquation(ctx, question.current);
 
         if (activeTargets.current.length < activeCount) {
@@ -250,6 +246,8 @@ function Game() {
     canvas.height = window.innerHeight;
     canvas.style.width = `${window.innerWidth}px`;
     canvas.style.height = `${window.innerHeight}px`;
+
+    if (!question.current) startNewLevel();
   }, []);
 
   React.useEffect(() => {
