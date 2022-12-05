@@ -77,10 +77,11 @@ function Game() {
     isGameActive.current = !isGameActive.current;
     setIsGamePaused(!isGamePaused);
     if (isGameOver === true) {
-      playerLives.current = 3;
-      score.current = 0;
-      question.current = "";
       setIsGameOver(false);
+      saveInfo();
+      score.current = 0;
+      playerLives.current = 3;
+      question.current = "";
     }
   };
 
@@ -95,12 +96,11 @@ function Game() {
       setIsGameOver(true);
       setIsGamePaused(true);
       isSwinging.current = false;
-      saveInfo();
     }
   };
 
   // save info to local storage
-  const saveInfo = React.useCallback(() => {
+  const saveInfo = () => {
     const difficulty = localStorage.getItem("difficulty");
     const current_date = new Date();
     const datetime = `${current_date.getDate()}/${
@@ -124,7 +124,7 @@ function Game() {
     const metadata = { ...user_data, games };
 
     localStorage.setItem("user", JSON.stringify(metadata));
-  }, []);
+  };
 
   // Mouse Handlers
   const startSwinging = () => {
