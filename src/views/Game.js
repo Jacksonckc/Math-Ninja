@@ -12,7 +12,7 @@ import PauseIcon from "@mui/icons-material/Pause";
 function Game() {
   const isGameActive = React.useRef(false);
   // handlers for game state
-  const [isGamePaused, setIsGamePaused] = React.useState(false);
+  const [isGamePaused, setIsGamePaused] = React.useState(true);
   const [isGameOver, setIsGameOver] = React.useState(false);
 
   const isGameOverRef = React.useRef(false);
@@ -77,17 +77,21 @@ function Game() {
 
   const setPaused = () => {
     isGameActive.current = !isGameActive.current;
-    setIsGamePaused(!isGamePaused);
-    if (isGameOver === true) {
-      console.log("Ran reset")
-      saveInfo();
-      score.current = 0;
-      playerLives.current = 3;
-      startNewLevel();
-      setIsGameOver(false);
-      isGameOverRef.current = false;
-    }
+    // isGamePaused should always be the opposite of isGameActive
+    console.log(isGamePaused, !isGameActive.current);
+    setIsGamePaused(!isGameActive.current);
   };
+
+  const resetGame = () => {
+    // Pause game at start
+    if (isGameActive.current) setPaused();
+
+    score.current = 0;
+    playerLives.current = 3;
+    startNewLevel();
+    setIsGameOver(false);
+    isGameOverRef.current = false;
+  }
 
   const removeFromActive = (target) => {
     const index = activeTargets.current.indexOf(target);
@@ -99,8 +103,8 @@ function Game() {
     if (playerLives.current === 0 && !isGameOver) {
       setIsGameOver(true);
       isGameOverRef.current = true;
-      setIsGamePaused(true);
       isSwinging.current = false;
+      saveInfo();
     }
   };
 
@@ -265,17 +269,17 @@ function Game() {
         onMouseMove={swing}
         onMouseUp={endSwinging}
       ></canvas>
-      {!isGameOver && !isGamePaused ? (
+      {!isGameOver && isGamePaused ? (
         <PlayCircleOutlineIcon
           id="play-button"
           onClick={setPaused}
-          style={{ display: !isGamePaused ? "block" : "none" }}
+          style={{ display: (isGamePaused && !isGameOver) ? "block" : "none" }}
         />
       ) : (
         <PauseIcon
           id="pause-button"
           onClick={setPaused}
-          style={{ display: isGamePaused ? "block" : "none" }}
+          style={{ display: !isGamePaused ? "block" : "none" }}
         />
       )}
       {isGameOver ? (
@@ -286,7 +290,7 @@ function Game() {
               You scored {score.current} on{" "}
               {localStorage.getItem("difficulty").toUpperCase()} difficulty.
             </p>
-            <button type="button" onClick={setPaused}>
+            <button type="button" onClick={resetGame}>
               Play Again
             </button>
           </div>
