@@ -12,7 +12,8 @@ function createData(id, time, score, difficulty) {
   return { id, time, score, difficulty };
 }
 
-const gamesData = JSON.parse(localStorage.getItem('user')).games;
+let gamesData = JSON.parse(localStorage.getItem('user'))?.games;
+!gamesData && (gamesData = []);
 console.log(gamesData);
 const rows = [];
 
