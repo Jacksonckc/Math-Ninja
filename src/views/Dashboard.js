@@ -161,17 +161,6 @@ function DashboardContent() {
             >
               Dashboard
             </Typography>
-            {/* <IconButton
-              color='inherit'
-              onClick={() => {
-                setShowNotification(!showNotification);
-                open && setOpen(!open);
-              }}
-            >
-              <Badge badgeContent={1} color='secondary'>
-                <NotificationsIcon />
-              </Badge>
-            </IconButton> */}
           </Toolbar>
         </AppBar>
         <Drawer variant='permanent' open={open}>
