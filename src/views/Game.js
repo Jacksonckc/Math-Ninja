@@ -136,15 +136,15 @@ function Game() {
       const { offsetX, offsetY } = nativeEvent;
       sword.current.swing(offsetX, offsetY, isSwinging.current);
       for (const target of activeTargets.current) {
-        const answer = sword.current.checkForSlice(
-          target,
-          offsetX,
-          offsetY,
-          score,
-          playerLives
-        );
-        if (answer) {
-          question.current = "";
+        if (sword.current.checkForSlice(target, offsetX, offsetY)) {
+          if (target.isCorrect()) {
+            score.current = score.current + 1;
+          } else {
+            //decrease score here
+            playerLives.current = playerLives.current - 1;
+          }
+          target.kill();
+          // TODO remove target from activeTargets
         }
       }
     }

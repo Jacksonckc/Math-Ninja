@@ -14,17 +14,12 @@ export class Blade {
     // }
   }
 
-  checkForSlice(target, x, y, score, playerLives) {
-    if (target.isWithinHitBox(x, y) && target.isCorrect() === true) {
-      score.current = score.current + 1;
-      target.kill();
+  checkForSlice(target, x, y) {
+    if (target.isWithinHitBox(x, y)) {
       return true;
-    } else if (target.isWithinHitBox(x, y) && target.isCorrect() === false) {
-      //decrease score here
-      playerLives.current = playerLives.current - 1;
-      target.kill();
-      return false;
     }
+    
+    return false;
   }
 
   draw(ctx) {
