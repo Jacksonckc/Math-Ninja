@@ -1,8 +1,8 @@
 import React from "react";
-import { spawn } from "../game_src/spawn";
+import { spawn } from "../game_src/spawn.js";
 
-import { Target } from "../game_src/target";
-import { Blade } from "../game_src/blade";
+import { Target } from "../game_src/target.js";
+import { Blade } from "../game_src/blade.js";
 import "../game_src/style.css";
 import { Button } from "@mui/material";
 
@@ -91,7 +91,7 @@ function Game() {
     generateNewLevel();
     setIsGameOver(false);
     isGameOverRef.current = false;
-  }
+  };
 
   const removeFromActive = (target) => {
     const index = activeTargets.current.indexOf(target);
@@ -219,7 +219,8 @@ function Game() {
 
             // Check if was correct answer
             if (tar.isCorrect()) {
-              playerLives.current = playerLives.current - (isGameOverRef.current ? 0 : 1);
+              playerLives.current =
+                playerLives.current - (isGameOverRef.current ? 0 : 1);
               generateNewLevel();
             }
           });
@@ -274,7 +275,7 @@ function Game() {
         <PlayCircleOutlineIcon
           id="play-button"
           onClick={setPaused}
-          style={{ display: (isGamePaused && !isGameOver) ? "block" : "none" }}
+          style={{ display: isGamePaused && !isGameOver ? "block" : "none" }}
         />
       ) : (
         <PauseIcon
@@ -289,7 +290,10 @@ function Game() {
             <h1>GAME OVER</h1>
             <p>
               You scored {score.current} on{" "}
-              {localStorage.getItem("difficulty").toUpperCase()} difficulty.
+              {localStorage.getItem("difficulty")
+                ? localStorage.getItem("difficulty").toUpperCase()
+                : "easy".toUpperCase()}{" "}
+              difficulty.
             </p>
             <button type="button" onClick={resetGame}>
               Play Again
