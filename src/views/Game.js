@@ -1,13 +1,15 @@
 import React from "react";
 import { spawn } from "../game_src/spawn";
 
-import { Target } from "../game_src/target";
 import { Blade } from "../game_src/blade";
 import "../game_src/style.css";
-import { Button } from "@mui/material";
 
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
 import PauseIcon from "@mui/icons-material/Pause";
+
+import { Howl, Howler } from "howler";
+import mainSound from "../game_src/assets/mainSound.mp3";
+import bladeSound from "../game_src/assets/bladeSound.mp3";
 
 function Game() {
   const isGameActive = React.useRef(false);
@@ -32,6 +34,8 @@ function Game() {
 
   const canvasRef = React.useRef();
   const [ctx, setCtx] = React.useState();
+
+  const [isMainSoundPlaying, setIsMainSoundPlaying] = React.useState(false);
 
   // draw game score
   const drawScore = (ctx) => {
@@ -91,7 +95,7 @@ function Game() {
     generateNewLevel();
     setIsGameOver(false);
     isGameOverRef.current = false;
-  }
+  };
 
   const removeFromActive = (target) => {
     const index = activeTargets.current.indexOf(target);
@@ -105,6 +109,23 @@ function Game() {
       isGameOverRef.current = true;
       isSwinging.current = false;
       saveInfo();
+    }
+  };
+
+  // plays sound
+  const playSound = (src) => {
+    const sound = new Howl({
+      src: src,
+      html5: true,
+      volume: 0.2,
+      loop: true,
+    });
+    // if (!isMainSoundPlaying) {
+    //   setIsMainSoundPlaying(true);
+    //   sound.play();
+    // }
+    if (isSwinging.correct) {
+      sound.play();
     }
   };
 
@@ -141,6 +162,7 @@ function Game() {
   // Mouse Handlers
   const startSwinging = () => {
     isSwinging.current = true;
+    playSound(bladeSound);
   };
 
   const swing = ({ nativeEvent }) => {
@@ -219,7 +241,8 @@ function Game() {
 
             // Check if was correct answer
             if (tar.isCorrect()) {
-              playerLives.current = playerLives.current - (isGameOverRef.current ? 0 : 1);
+              playerLives.current =
+                playerLives.current - (isGameOverRef.current ? 0 : 1);
               generateNewLevel();
             }
           });
@@ -262,7 +285,12 @@ function Game() {
   }, [ctx]);
 
   return (
-    <div id="game-interface" tabIndex="0" onKeyDown={handleKeyDown}>
+    <div
+      id="game-interface"
+      tabIndex="0"
+      onKeyDown={handleKeyDown}
+      onClick={() => playSound(mainSound)}
+    >
       <canvas
         id="canvas"
         ref={canvasRef}
@@ -274,7 +302,7 @@ function Game() {
         <PlayCircleOutlineIcon
           id="play-button"
           onClick={setPaused}
-          style={{ display: (isGamePaused && !isGameOver) ? "block" : "none" }}
+          style={{ display: isGamePaused && !isGameOver ? "block" : "none" }}
         />
       ) : (
         <PauseIcon
