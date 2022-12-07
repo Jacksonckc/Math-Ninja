@@ -1,8 +1,10 @@
 import React from "react";
-import { spawn } from "../game_src/spawn";
+import { spawn } from "../game_src/spawn.js";
+
 
 import { Blade } from "../game_src/blade";
 import { SoundHandler } from "../game_src/soundHandler";
+
 import "../game_src/style.css";
 
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
@@ -248,6 +250,7 @@ function Game() {
 
             // Check if was correct answer
             if (tar.isCorrect()) {
+
               soundHandler.playWrongAnswer();
               playerLives.current =
                 playerLives.current - (isGameOverRef.current ? 0 : 1);
