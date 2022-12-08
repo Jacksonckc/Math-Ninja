@@ -73,6 +73,7 @@ body {
   transform: scale(1.5);
   background-color: white;
   border-radius: 3rem;
+  box-shadow: 0 0 5px 1px black;
   z-index: 5;
 }
 .volume-control:hover {
@@ -88,6 +89,7 @@ body {
   background-color: white;
   border-radius: 3rem;
   z-index: 5;
+  box-shadow: 0 0 5px 1px black;
 }
 
 .home-button:hover {

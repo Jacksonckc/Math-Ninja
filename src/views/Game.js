@@ -98,9 +98,11 @@ function Game() {
   };
 
   const handleMute = () => {
-    const toggle = !isMute;
-    setIsMute(toggle);
-    soundHandler.muteMainSound(isMute, mainSoundId, sound);
+    if (sound) {
+      const toggle = !isMute;
+      setIsMute(toggle);
+      soundHandler.muteMainSound(isMute, mainSoundId, sound);
+    }
   };
 
   const handleHomeClick = () => {
@@ -328,7 +330,11 @@ function Game() {
         <HomeIcon className="home-button" />
       </Link>
       {isMute ? (
-        <VolumeOffIcon className="volume-control" onClick={handleMute} />
+        <VolumeOffIcon
+          className="volume-control"
+          onClick={handleMute}
+          style={{ color: "red" }}
+        />
       ) : (
         <VolumeUpIcon className="volume-control" onClick={handleMute} />
       )}
