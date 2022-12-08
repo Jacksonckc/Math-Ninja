@@ -195,7 +195,9 @@ function Game() {
             generateNewLevel();
           } else {
             //decrease score here
-            wrongAnswers.current.push(`${question.current} = ${target.value}`);
+            wrongAnswers.current.push(
+              `${question.current} = ${target.value} - WRONG TARGET`
+            );
             playerLives.current = playerLives.current - 1;
             playerLives.current === 0
               ? soundHandler.playGameOver()
@@ -263,7 +265,7 @@ function Game() {
             if (tar.isCorrect()) {
               soundHandler.playWrongAnswer();
               wrongAnswers.current.push(
-                `${question.current} = ${target.value}`
+                `${question.current} = ${target.value} - MISSED`
               );
               playerLives.current =
                 playerLives.current - (isGameOverRef.current ? 0 : 1);
