@@ -78,3 +78,18 @@ body {
 .volume-control:hover {
   cursor: pointer;
 }
+
+.home-button {
+  position: absolute;
+  top: 2rem;
+  right: 9rem;
+  color: black;
+  transform: scale(1.5);
+  background-color: white;
+  border-radius: 3rem;
+  z-index: 5;
+}
+
+.home-button:hover {
+  cursor: pointer;
+}

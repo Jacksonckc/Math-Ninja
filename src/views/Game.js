@@ -1,16 +1,16 @@
 import React from "react";
+import { Link } from "react-router-dom";
+
 import { spawn } from "../game_src/spawn.js";
-
-
 import { Blade } from "../game_src/blade";
 import { SoundHandler } from "../game_src/soundHandler";
-
 import "../game_src/style.css";
 
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
 import PauseIcon from "@mui/icons-material/Pause";
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
+import HomeIcon from "@mui/icons-material/Home";
 
 function Game() {
   const isGameActive = React.useRef(false);
@@ -29,10 +29,12 @@ function Game() {
   const gameTime = React.useRef(0);
 
   const question = React.useRef("");
+  const wrongAnswers = React.useRef([]);
 
   const readyTargets = React.useRef([]);
   const activeTargets = React.useRef([]);
 
+  // Set up canvas
   const canvasRef = React.useRef();
   const [ctx, setCtx] = React.useState();
 
@@ -97,9 +99,12 @@ function Game() {
 
   const handleMute = () => {
     const toggle = !isMute;
-    console.log(`Prev state: ${isMute}`);
     setIsMute(toggle);
     soundHandler.muteMainSound(isMute, mainSoundId, sound);
+  };
+
+  const handleHomeClick = () => {
+    soundHandler.stopMainSound(mainSoundId, sound);
   };
 
   const setPaused = () => {
@@ -136,7 +141,9 @@ function Game() {
 
   // save info to local storage
   const saveInfo = () => {
-    const difficulty = localStorage.getItem("difficulty");
+    const difficulty = localStorage.getItem("difficulty")
+      ? localStorage.getItem("difficulty")
+      : "easy";
     const current_date = new Date();
     const datetime = `${current_date.getDate()}/${
       current_date.getMonth() + 1
@@ -152,6 +159,7 @@ function Game() {
       timestamp: datetime,
       game_score: score.current,
       difficulty: difficulty,
+      wrong_answers: wrongAnswers.current,
     };
 
     const games =
@@ -187,6 +195,7 @@ function Game() {
             generateNewLevel();
           } else {
             //decrease score here
+            wrongAnswers.current.push(`${question.current} = ${target.value}`);
             playerLives.current = playerLives.current - 1;
             playerLives.current === 0
               ? soundHandler.playGameOver()
@@ -231,6 +240,7 @@ function Game() {
 
         drawEquation(ctx, question.current);
 
+        // Activate targets on screen
         if (activeTargets.current.length < activeCount) {
           const count = activeCount - activeTargets.current.length;
 
@@ -243,6 +253,7 @@ function Game() {
           }
         }
 
+        // Checking if targets is correct when they go offscreen.
         for (const target of activeTargets.current) {
           target.tick(ctx, (tar) => {
             // Remove self from activeTargets
@@ -250,14 +261,18 @@ function Game() {
 
             // Check if was correct answer
             if (tar.isCorrect()) {
-
               soundHandler.playWrongAnswer();
+              wrongAnswers.current.push(
+                `${question.current} = ${target.value}`
+              );
               playerLives.current =
                 playerLives.current - (isGameOverRef.current ? 0 : 1);
               generateNewLevel();
             }
           });
         }
+
+        // Draw and update sword
         sword.current.draw(ctx);
         if (gameTime.current % 2 === 0) {
           sword.current.update();
@@ -265,8 +280,6 @@ function Game() {
       }
 
       checkPlayerAlive();
-
-      //ctx.font = "50px Arial";
 
       requestAnimationFrame(animate);
       // ADJUST num FOR PREFERENCE OF BLADE
@@ -309,6 +322,9 @@ function Game() {
         onMouseMove={swing}
         onMouseUp={endSwinging}
       ></canvas>
+      <Link to="/" onClick={handleHomeClick}>
+        <HomeIcon className="home-button" />
+      </Link>
       {isMute ? (
         <VolumeOffIcon className="volume-control" onClick={handleMute} />
       ) : (
