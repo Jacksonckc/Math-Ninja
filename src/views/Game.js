@@ -1,13 +1,16 @@
 import React from "react";
 import { spawn } from "../game_src/spawn.js";
 
-import { Target } from "../game_src/target.js";
-import { Blade } from "../game_src/blade.js";
+
+import { Blade } from "../game_src/blade";
+import { SoundHandler } from "../game_src/soundHandler";
+
 import "../game_src/style.css";
-import { Button } from "@mui/material";
 
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
 import PauseIcon from "@mui/icons-material/Pause";
+import VolumeOffIcon from "@mui/icons-material/VolumeOff";
+import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 
 function Game() {
   const isGameActive = React.useRef(false);
@@ -32,6 +35,13 @@ function Game() {
 
   const canvasRef = React.useRef();
   const [ctx, setCtx] = React.useState();
+
+  // Sound Handler
+  const soundHandler = new SoundHandler();
+  const [isMute, setIsMute] = React.useState(false);
+  const [isMainSoundPlaying, setIsMainSoundPlaying] = React.useState(false);
+  const [mainSoundId, setMainSoundId] = React.useState(0);
+  const [sound, setSound] = React.useState(null);
 
   // draw game score
   const drawScore = (ctx) => {
@@ -75,10 +85,26 @@ function Game() {
     }
   };
 
+  const handleMouseDown = () => {
+    if (!isMainSoundPlaying) {
+      // Returns an array of sound and mainSoundId
+      const id = soundHandler.playMainSound();
+      setMainSoundId(id[0]);
+      setSound(id[1]);
+    }
+    setIsMainSoundPlaying(true);
+  };
+
+  const handleMute = () => {
+    const toggle = !isMute;
+    console.log(`Prev state: ${isMute}`);
+    setIsMute(toggle);
+    soundHandler.muteMainSound(isMute, mainSoundId, sound);
+  };
+
   const setPaused = () => {
     isGameActive.current = !isGameActive.current;
     // isGamePaused should always be the opposite of isGameActive
-    console.log(isGamePaused, !isGameActive.current);
     setIsGamePaused(!isGameActive.current);
   };
 
@@ -141,10 +167,11 @@ function Game() {
   // Mouse Handlers
   const startSwinging = () => {
     isSwinging.current = true;
+    soundHandler.playSoundSlice(isGameActive.current);
   };
 
   const swing = ({ nativeEvent }) => {
-    if (isSwinging.current) {
+    if (isSwinging.current && isGameActive.current) {
       const { offsetX, offsetY } = nativeEvent;
       sword.current.swing(offsetX, offsetY, isSwinging.current);
       for (const target of activeTargets.current) {
@@ -156,10 +183,14 @@ function Game() {
 
           if (target.isCorrect()) {
             score.current = score.current + 1;
+            soundHandler.playCorrectAnswer();
             generateNewLevel();
           } else {
             //decrease score here
             playerLives.current = playerLives.current - 1;
+            playerLives.current === 0
+              ? soundHandler.playGameOver()
+              : soundHandler.playWrongAnswer();
           }
         }
       }
@@ -219,6 +250,8 @@ function Game() {
 
             // Check if was correct answer
             if (tar.isCorrect()) {
+
+              soundHandler.playWrongAnswer();
               playerLives.current =
                 playerLives.current - (isGameOverRef.current ? 0 : 1);
               generateNewLevel();
@@ -263,7 +296,12 @@ function Game() {
   }, [ctx]);
 
   return (
-    <div id="game-interface" tabIndex="0" onKeyDown={handleKeyDown}>
+    <div
+      id="game-interface"
+      tabIndex="0"
+      onKeyDown={handleKeyDown}
+      onClick={handleMouseDown}
+    >
       <canvas
         id="canvas"
         ref={canvasRef}
@@ -271,6 +309,11 @@ function Game() {
         onMouseMove={swing}
         onMouseUp={endSwinging}
       ></canvas>
+      {isMute ? (
+        <VolumeOffIcon className="volume-control" onClick={handleMute} />
+      ) : (
+        <VolumeUpIcon className="volume-control" onClick={handleMute} />
+      )}
       {!isGameOver && isGamePaused ? (
         <PlayCircleOutlineIcon
           id="play-button"

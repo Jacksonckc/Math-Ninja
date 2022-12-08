@@ -14,10 +14,12 @@ body {
 
 #pause-button {
   position: absolute;
-  top: 1em;
-  right: 3em;
+  top: 2rem;
+  right: 3rem;
   transform: scale(1.5);
-  color: white;
+  color: black;
+  background-color: white;
+  border-radius: 3rem;
   z-index: 2;
 }
 
@@ -61,4 +63,18 @@ body {
   height: 50%;
   background-color: white;
   border-radius: 2rem;
+}
+
+.volume-control {
+  position: absolute;
+  top: 2rem;
+  right: 6rem;
+  color: black;
+  transform: scale(1.5);
+  background-color: white;
+  border-radius: 3rem;
+  z-index: 5;
+}
+.volume-control:hover {
+  cursor: pointer;
 }
