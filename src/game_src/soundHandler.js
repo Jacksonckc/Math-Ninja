@@ -27,6 +27,11 @@ export class SoundHandler {
     }
   }
 
+  // Stop Main Sound
+  stopMainSound(id, sound) {
+    sound.stop(id);
+  }
+
   // Slice Sound
   playSoundSlice(isGameActive) {
     const sound = new Howl({
